@@ -30,15 +30,15 @@ Here's a simple use case. A `Post` model would like to denormalize some data abo
 
     class Post
       include Mongoid::Document
-
       include Mongoid::Alize
+
       field :title
       field :category
 
       has_one :user
 
       # ***
-      alize :user, :name, :city # denormalize the user relation
+      alize :user, :name, :city # denormalize name and city from user
       # ***
 
     end
@@ -60,28 +60,13 @@ Here's the inverse case - where we'd like to store Post data into the User recor
       has_many :posts
 
       # ***
-      alize :posts # denormalize the posts relation
+      alize :posts # denormalize all fields from posts (the default w/ no fields specified)
       # ***
     end
 
     # Post data now saves into the User record
     @user.posts << Post.create!(:title => "Building a new bike", :category => "Cycling")
     @user.posts_fields #=> [{ "title" => "Building a new bike", :category => "Cycling" }]
-
-You can also specify the exact list of fields you'd like denormalized (the default is all non-system fields):
-
-    class User
-      ...
-
-      # ***
-      alize :posts, :title # denormalize the title field only
-      # ***
-
-    end
-
-    # ONLY the title attribute of posts are saved into the user record
-    @user.posts << Post.create!(:title => "Building a new bike", :category => "Cycling")
-    @user.posts_fields #=> [{ "title" => "Building a new bike" }]
 
 One-to-one, many-to-one, one-to-many, and many-to-many referenced relations should all work.
 
@@ -118,5 +103,6 @@ Todos/Coming Soon
 Credits / License
 -------
 Mongoid::Alize - Copyright (c) 2012 Josh Dzielak
+MIT License
 
 A big thanks to Durran Jordan for creating [Mongoid](http://mongoid.org).
