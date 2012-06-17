@@ -134,8 +134,6 @@ describe Mongoid::Alize do
     describe "has_and_belongs_to_many" do
       before do
         Head.send(:alize, :wanted_by, *person_fields)
-        @head.wanted_by = [@person]
-        @person.wants = [@head]
       end
 
       def assert_wanted_by
@@ -145,19 +143,23 @@ describe Mongoid::Alize do
       end
 
       it "should pull attributes from wanted_by" do
+        @head.wanted_by = [@person]
         @head.save!
         assert_wanted_by
       end
 
       it "should push attributes to wanted_by" do
+        @person.wants = [@head]
         @person.update_attributes!(:name => @name = "Bill")
         assert_wanted_by
       end
 
       it "should remove wanted_by_fields entries in head when person is destroyed" do
+        @head.wanted_by = [@person]
         @head.save!
         assert_wanted_by
         @person.destroy
+        @head.reload
         @head.wanted_by_fields.should == []
         @head.reload.wanted_by_fields.should == []
       end
