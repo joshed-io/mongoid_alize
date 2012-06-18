@@ -9,14 +9,14 @@ describe Mongoid::Alize::Callbacks::From::Many do
     [Head, :wanted_by, [:name, :created_at]]
   end
 
-  def new_unit
+  def new_callback
     klass.new(*args)
   end
 
   describe "#define_fields" do
     it "should define an Array called {relation}_fields" do
-      unit = new_unit
-      unit.send(:define_fields)
+      callback = new_callback
+      callback.send(:define_fields)
       Head.fields["wanted_by_fields"].type.should == Array
     end
   end
@@ -31,9 +31,9 @@ describe Mongoid::Alize::Callbacks::From::Many do
         :wanted_by => [@person = Person.create(:name => "Bob",
                                         :created_at => @now = Time.now)])
 
-      @unit = new_unit
-      @unit.send(:define_fields)
-      @unit.send(:define_callback)
+      @callback = new_callback
+      @callback.send(:define_fields)
+      @callback.send(:define_callback)
     end
 
     it "should pull the fields from the relation" do

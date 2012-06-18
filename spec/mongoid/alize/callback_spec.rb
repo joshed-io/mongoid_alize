@@ -9,18 +9,18 @@ describe Mongoid::Alize::Callback do
     [Head, :person, [:name, :created_at]]
   end
 
-  def new_unit
+  def new_callback
     klass.new(*args)
   end
 
   describe "initialize" do
     it "should assign class attributes" do
-      unit = new_unit
-      unit.klass.should == Head
-      unit.relation.should == :person
-      unit.inverse_klass = Person
-      unit.inverse_relation = :head
-      unit.fields.should == [:name, :created_at]
+      callback = new_callback
+      callback.klass.should == Head
+      callback.relation.should == :person
+      callback.inverse_klass = Person
+      callback.inverse_relation = :head
+      callback.fields.should == [:name, :created_at]
     end
   end
 end

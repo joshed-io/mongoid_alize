@@ -9,22 +9,22 @@ describe Mongoid::Alize::Callbacks::From::One do
     [Head, :person, [:name, :created_at]]
   end
 
-  def new_unit
+  def new_callback
     klass.new(*args)
   end
 
   describe "#define_fields" do
     it "should add properly typed, prefixed fields from the relation" do
-      unit = new_unit
-      unit.send(:define_fields)
+      callback = new_callback
+      callback.send(:define_fields)
       Head.fields["person_name"].type.should == String
       Head.fields["person_created_at"].type.should == Time
     end
 
     it "should raise an InvalidField error for a field that's not defined" do
-      unit = klass.new(Head, :person, [:date_of_birth])
+      callback = klass.new(Head, :person, [:date_of_birth])
       expect {
-        unit.send(:define_fields)
+        callback.send(:define_fields)
       }.to raise_error(Mongoid::Alize::Errors::InvalidField,
                        "date_of_birth does not exist on the Person model.")
     end
@@ -39,9 +39,9 @@ describe Mongoid::Alize::Callbacks::From::One do
       @head = Head.create(
         :person => @person = Person.create(:name => @name = "Bob",
                                            :created_at => @now = Time.now))
-      @unit = new_unit
-      @unit.send(:define_fields)
-      @unit.send(:define_callback)
+      @callback = new_callback
+      @callback.send(:define_fields)
+      @callback.send(:define_callback)
     end
 
     it "should set pull fields from the relation" do

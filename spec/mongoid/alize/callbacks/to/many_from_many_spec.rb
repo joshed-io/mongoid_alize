@@ -9,7 +9,7 @@ describe Mongoid::Alize::Callbacks::To::ManyFromMany do
     [Person, :wants, [:name, :created_at]]
   end
 
-  def new_unit
+  def new_callback
     klass.new(*args)
   end
 
@@ -33,12 +33,12 @@ describe Mongoid::Alize::Callbacks::To::ManyFromMany do
                                       :created_at => @now = Time.now)])
     @person.wants = [@head]
 
-    @unit = new_unit
+    @callback = new_callback
   end
 
   describe "#define_callback" do
     before do
-      @unit.send(:define_callback)
+      @callback.send(:define_callback)
     end
 
     def run_callback
@@ -67,7 +67,7 @@ describe Mongoid::Alize::Callbacks::To::ManyFromMany do
 
   describe "#define_destroy_callback" do
     before do
-      @unit.send(:define_destroy_callback)
+      @callback.send(:define_destroy_callback)
     end
 
     def run_destroy_callback
