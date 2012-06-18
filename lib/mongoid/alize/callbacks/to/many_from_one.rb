@@ -6,7 +6,7 @@ module Mongoid
           protected
 
           def iterable_relation
-            "self.#{relation} ? [self.#{relation}] : []"
+            surrounded_relation
           end
         end
       end

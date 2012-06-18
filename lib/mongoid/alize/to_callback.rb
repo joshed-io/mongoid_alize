@@ -27,6 +27,14 @@ module Mongoid
       def destroy_callback_name
         "denormalize_destroy_to_#{relation}"
       end
+
+      def plain_relation
+        "self.#{relation}"
+      end
+
+      def surrounded_relation
+        "self.#{relation} ? [self.#{relation}] : []"
+      end
     end
   end
 end

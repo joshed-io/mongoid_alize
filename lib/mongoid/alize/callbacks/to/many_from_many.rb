@@ -6,8 +6,9 @@ module Mongoid
           protected
 
           def iterable_relation
-            "self.#{relation}"
+            plain_relation
           end
+
         end
       end
     end
