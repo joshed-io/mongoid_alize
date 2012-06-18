@@ -17,11 +17,10 @@ module Mongoid
           end
 
           def define_fields
-            unless !!klass.fields[prefixed_name]
-              klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-                field :#{prefixed_name}, :type => Array
-              CALLBACK
-            end
+            ensure_field_not_defined!(prefixed_name, klass)
+            klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
+              field :#{prefixed_name}, :type => Array
+            CALLBACK
           end
 
           def prefixed_name

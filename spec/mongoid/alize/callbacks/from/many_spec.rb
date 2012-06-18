@@ -19,6 +19,17 @@ describe Mongoid::Alize::Callbacks::From::Many do
       callback.send(:define_fields)
       Head.fields["wanted_by_fields"].type.should == Array
     end
+
+    it "should raise an already defined field error if the field already exists" do
+      Head.class_eval do
+        field :wanted_by_fields
+      end
+      callback = new_callback
+      expect {
+        callback.send(:define_fields)
+      }.to raise_error(Mongoid::Alize::Errors::AlreadyDefinedField,
+                       "wanted_by_fields is already defined on the Head model.")
+    end
   end
 
   describe "the defined callback" do
