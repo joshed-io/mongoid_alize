@@ -18,8 +18,6 @@ module Mongoid
                 #{field_sets}
                 true
               end
-
-              protected :#{callback_name}
             CALLBACK
           end
 

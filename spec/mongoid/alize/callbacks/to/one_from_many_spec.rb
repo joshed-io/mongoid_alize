@@ -33,11 +33,7 @@ describe Mongoid::Alize::Callbacks::To::OneFromMany do
     end
 
     def run_callback
-      @person.send(callback_name)
-    end
-
-    def callback_name
-      "denormalize_to_heads"
+      @person.denormalize_to_heads
     end
 
     it "should push the fields to the relation" do
@@ -51,11 +47,7 @@ describe Mongoid::Alize::Callbacks::To::OneFromMany do
 
   describe "#define_destroy_callback" do
     def run_destroy_callback
-      @person.send(destroy_callback_name)
-    end
-
-    def destroy_callback_name
-      "denormalize_destroy_to_heads"
+      @person.denormalize_destroy_to_heads
     end
 
     before do

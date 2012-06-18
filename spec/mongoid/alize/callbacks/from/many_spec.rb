@@ -23,11 +23,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
 
   describe "the defined callback" do
     def run_callback
-      @head.send(callback_name)
-    end
-
-    def callback_name
-      "denormalize_from_wanted_by"
+      @head.denormalize_from_wanted_by
     end
 
     before do

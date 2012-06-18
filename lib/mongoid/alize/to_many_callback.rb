@@ -32,8 +32,6 @@ module Mongoid
               #{push_content}
             end
           end
-
-          protected :#{_callback_name}
         CALLBACK
       end
 

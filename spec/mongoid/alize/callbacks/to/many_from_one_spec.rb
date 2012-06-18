@@ -41,11 +41,7 @@ describe Mongoid::Alize::Callbacks::To::ManyFromOne do
     end
 
     def run_callback
-      @person.send(callback_name)
-    end
-
-    def callback_name
-      "denormalize_to_seen_by"
+      @person.denormalize_to_seen_by
     end
 
     it "should push the fields to the relation" do
@@ -79,11 +75,7 @@ describe Mongoid::Alize::Callbacks::To::ManyFromOne do
     end
 
     def run_destroy_callback
-      @person.send(destroy_callback_name)
-    end
-
-    def destroy_callback_name
-      "denormalize_destroy_to_seen_by"
+      @person.denormalize_destroy_to_seen_by
     end
 
     it "should pull first any existing array entries matching the _id" do

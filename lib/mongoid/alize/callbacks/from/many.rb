@@ -13,8 +13,6 @@ module Mongoid
                   model.attributes.slice(#{joined_fields})
                 end
               end
-
-              protected :#{callback_name}
             CALLBACK
           end
 

@@ -24,7 +24,7 @@ module Mongoid
         # implement in subclasses
       end
 
-      protected
+      private
 
       def joined_fields
         (fields + [:_id]).map {|f| "'#{f}'" }.join(", ")
