@@ -6,7 +6,7 @@ describe Mongoid::Alize::Callbacks::From::One do
   end
 
   def args
-    [Head, :person, [:name, :created_at]]
+    [Head, :person, [:name, :location, :created_at]]
   end
 
   def new_callback
@@ -15,18 +15,16 @@ describe Mongoid::Alize::Callbacks::From::One do
 
   describe "#define_fields" do
     it "should add properly typed, prefixed fields from the relation" do
-      callback = new_callback
+      callback = klass.new(Head, :person, [:name, :created_at])
       callback.send(:define_fields)
       Head.fields["person_name"].type.should == String
       Head.fields["person_created_at"].type.should == Time
     end
 
-    it "should raise an InvalidField error for a field that's not defined" do
-      callback = klass.new(Head, :person, [:date_of_birth])
-      expect {
-        callback.send(:define_fields)
-      }.to raise_error(Mongoid::Alize::Errors::InvalidField,
-                       "date_of_birth does not exist on the Person model.")
+    it "should define as a string field that's not defined" do
+      callback = klass.new(Head, :person, [:location])
+      callback.send(:define_fields)
+      Head.fields["person_location"].type.should == String
     end
 
     it "should raise an already defined field error if a field already exists" do
@@ -76,6 +74,7 @@ describe Mongoid::Alize::Callbacks::From::One do
       run_callback
       @head.person_name.should == @name
       @head.person_created_at.to_i.should == @now.to_i
+      @head.person_location.should == "Paris"
     end
 
     it "should assign nil values if the relation is nil" do

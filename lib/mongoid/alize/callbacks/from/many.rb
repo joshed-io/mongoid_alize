@@ -10,7 +10,10 @@ module Mongoid
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               def #{callback_name}
                 self.#{prefixed_name} = self.#{relation}.map do |model|
-                  model.attributes.slice(#{joined_fields})
+                  [#{joined_fields}].inject({}) { |hash, name|
+                    hash[name] = model.send(name)
+                    hash
+                  }
                 end
               end
             CALLBACK

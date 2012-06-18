@@ -17,5 +17,8 @@ class Person
   # the only head that is watching
   belongs_to :seen_by, :class_name => "Head", :inverse_of => :sees
 
+  def location
+    "Paris"
+  end
 end
 

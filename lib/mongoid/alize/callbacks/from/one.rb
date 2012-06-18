@@ -9,7 +9,7 @@ module Mongoid
           def define_callback
             field_sets = ""
             fields.each do |name|
-              field_sets << "self.set(:#{prefixed_field_name(name)}, relation && relation.read_attribute(:#{name}))\n"
+              field_sets << "self.send(:#{prefixed_field_name(name)}=, relation && relation.send(:#{name}))\n"
             end
 
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
@@ -42,11 +42,7 @@ module Mongoid
             name = "_type" if name == "type"
 
             field = inverse_klass.fields[name]
-            if field
-              field.options[:type] ? field.type : String
-            else
-              raise Mongoid::Alize::Errors::InvalidField.new(name, inverse_klass.name)
-            end
+            (field && field.options[:type]) ? field.type : String
           end
         end
       end

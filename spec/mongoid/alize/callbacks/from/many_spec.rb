@@ -6,7 +6,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
   end
 
   def args
-    [Head, :wanted_by, [:name, :created_at]]
+    [Head, :wanted_by, [:name, :location, :created_at]]
   end
 
   def new_callback
@@ -42,19 +42,40 @@ describe Mongoid::Alize::Callbacks::From::Many do
         :wanted_by => [@person = Person.create(:name => "Bob",
                                         :created_at => @now = Time.now)])
 
-      @callback = new_callback
-      @callback.send(:define_fields)
-      @callback.send(:define_callback)
     end
 
-    it "should pull the fields from the relation" do
-      @head.wanted_by_fields.should be_nil
-      run_callback
-      @head.wanted_by_fields.should == [{
-        "_id" => @person.id,
-        "name"=> "Bob",
-        "created_at"=> @now.to_s(:utc)
-      }]
+    describe "valid fields" do
+      before do
+        @callback = new_callback
+        @callback.send(:define_fields)
+        @callback.send(:define_callback)
+      end
+
+      it "should pull the fields from the relation" do
+        @head.wanted_by_fields.should be_nil
+        run_callback
+        @head.wanted_by_fields.should == [{
+          "_id" => @person.id,
+          "name"=> "Bob",
+          "location" => "Paris",
+          "created_at"=> @now.to_s(:utc)
+        }]
+      end
+    end
+
+    describe "with a field that doesn't exist" do
+      before do
+        @callback = klass.new(Head, :wanted_by, [:notreal])
+        @callback.send(:define_fields)
+        @callback.send(:define_callback)
+      end
+
+      it "should raise a no method error" do
+        @head.wanted_by_fields.should be_nil
+        expect {
+          run_callback
+        }.to raise_error NoMethodError
+      end
     end
   end
 end

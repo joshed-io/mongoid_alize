@@ -19,4 +19,8 @@ class Head
 
   # a relation with no inverse
   has_many :admirer, :class_name => "Person", :inverse_of => nil
+
+  def density
+    "low"
+  end
 end
