@@ -1,0 +1,8 @@
+en:
+  mongoid:
+    errors:
+      messages:
+        alize:
+          invalid_field:
+            "%{name} does not exist on the %{inverse_klass} model."
+
