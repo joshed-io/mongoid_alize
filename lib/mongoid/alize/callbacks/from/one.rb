@@ -38,7 +38,11 @@ module Mongoid
 
           def inverse_field_type(name)
             field = inverse_klass.fields[name.to_s]
-            field.options[:type] ? field.type : String
+            if field
+              field.options[:type] ? field.type : String
+            else
+              raise Mongoid::Alize::Errors::InvalidField.new(name, inverse_klass.name)
+            end
           end
         end
       end

@@ -20,6 +20,14 @@ describe Mongoid::Alize::Callbacks::From::One do
       Head.fields["person_name"].type.should == String
       Head.fields["person_created_at"].type.should == Time
     end
+
+    it "should raise an InvalidField error for a field that's not defined" do
+      unit = klass.new(Head, :person, [:date_of_birth])
+      expect {
+        unit.send(:define_fields)
+      }.to raise_error(Mongoid::Alize::Errors::InvalidField,
+                       "date_of_birth does not exist on the Person model.")
+    end
   end
 
   describe "the defined callback" do
