@@ -24,9 +24,13 @@ module Mongoid
           def define_fields
             fields.each do |name|
               prefixed_name = prefixed_field_name(name)
-              klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-                field :#{prefixed_name}, :type => #{inverse_field_type(name)}
-              CALLBACK
+              if klass.fields[prefixed_name]
+                raise Mongoid::Alize::Errors::AlreadyDefinedField.new(prefixed_name, klass.name)
+              else
+                klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
+                  field :#{prefixed_name}, :type => #{inverse_field_type(name)}
+                CALLBACK
+              end
             end
           end
 
@@ -35,7 +39,12 @@ module Mongoid
           end
 
           def inverse_field_type(name)
-            field = inverse_klass.fields[name.to_s]
+            name = name.to_s
+
+            name = "_id" if name == "id"
+            name = "_type" if name == "type"
+
+            field = inverse_klass.fields[name]
             if field
               field.options[:type] ? field.type : String
             else

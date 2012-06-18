@@ -1,5 +1,6 @@
 require 'mongoid/alize/errors/alize_error'
 require 'mongoid/alize/errors/invalid_field'
+require 'mongoid/alize/errors/already_defined_field'
 
 require 'mongoid/alize/callback'
 
