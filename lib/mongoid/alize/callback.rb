@@ -24,6 +24,11 @@ module Mongoid
         # implement in subclasses
       end
 
+      def callback_attached?(klass, callback_type, callback_name)
+        !!klass.send(:"_#{callback_type}_callbacks").
+          map(&:raw_filter).include?(callback_name)
+      end
+
       private
 
       def joined_fields

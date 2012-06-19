@@ -4,9 +4,11 @@ module Mongoid
 
       def attach
         define_fields
-
         define_callback
-        set_callback
+
+        unless callback_attached?(klass, "create", callback_name)
+          set_callback
+        end
       end
 
       protected

@@ -4,10 +4,16 @@ module Mongoid
 
       def attach
         define_callback
-        set_callback
+
+        unless callback_attached?(klass, "save", callback_name)
+          set_callback
+        end
 
         define_destroy_callback
-        set_destroy_callback
+
+        unless callback_attached?(klass, "destroy", destroy_callback_name)
+          set_destroy_callback
+        end
       end
 
       protected
