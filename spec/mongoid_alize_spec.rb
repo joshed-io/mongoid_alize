@@ -165,4 +165,49 @@ describe Mongoid::Alize do
       end
     end
   end
+
+  describe "overriding denormalize methods for custom behavior on the from side" do
+    before do
+      class Person
+        def denormalize_update_name_first
+          self.name = "Overrider"
+        end
+      end
+
+      class Head
+        def denormalize_from_person
+          self.person.denormalize_update_name_first
+          _denormalize_from_person
+        end
+      end
+
+      Head.send(:alize, :person, *person_fields)
+      @head.person = @person
+    end
+
+    it "should be possible to define a method before alize and call the alize version within it" do
+      @head.save!
+      @head.person_name.should == "Overrider"
+    end
+  end
+
+  describe "overriding denormalize methods for custom behavior on the to side" do
+    before do
+      class Person
+        def denormalize_to_head
+          self.name = "Overrider"
+          _denormalize_to_head
+        end
+      end
+
+      Head.send(:alize, :person, *person_fields)
+      @head.person = @person
+      @head.save!
+    end
+
+    it "should be possible to define a method before alize and call the alize version within it" do
+      @person.update_attributes!(:name => @name = "Bill")
+      @head.person_name.should == "Overrider"
+    end
+  end
 end
