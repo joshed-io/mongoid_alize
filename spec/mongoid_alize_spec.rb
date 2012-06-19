@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Mongoid::Alize do
   def person_fields
-    [:name]
+    [:name, :location]
   end
 
   def head_fields
@@ -10,8 +10,10 @@ describe Mongoid::Alize do
   end
 
   before do
-    @head = Head.new(:size => @size = 10)
-    @person = Person.new(:name => @name = "Bob")
+    @now = Time.now
+    stub(Time).now { @now }
+    @head = Head.new(:size => @size = 10, created_at: @now)
+    @person = Person.new(:name => @name = "Bob", created_at: @now)
   end
 
   describe "one-to-one" do
@@ -23,6 +25,7 @@ describe Mongoid::Alize do
 
       def assert_head
         @head.person_name.should == @name
+        @head.person_location.should == "Paris"
       end
 
       it "should pull data from person on create" do
@@ -53,6 +56,7 @@ describe Mongoid::Alize do
         @head.update_attributes!(:person_name => "Old Gregg")
         @person.destroy
         @head.person_name.should be_nil
+        @head.person_location.should be_nil
       end
     end
 
@@ -135,6 +139,7 @@ describe Mongoid::Alize do
       def assert_sees
         @head.sees_fields.should == [{
           "_id" => @person.id,
+          "location" => "Paris",
           "name" => @name }]
       end
 
@@ -174,6 +179,7 @@ describe Mongoid::Alize do
       def assert_wanted_by
         @head.wanted_by_fields.should == [{
           "_id" => @person.id,
+          "location" => "Paris",
           "name" => @name }]
       end
 
@@ -206,6 +212,19 @@ describe Mongoid::Alize do
         @head.wanted_by_fields.should == []
         @head.reload.wanted_by_fields.should == []
       end
+    end
+  end
+
+  describe "without specifying fields" do
+    before do
+      Head.send(:alize, :person)
+      @head.person = @person
+    end
+
+    it "should denormalize all non-internal fields" do
+      @head.save!
+      @head.person_name.should == @name
+      @head.person_created_at.to_i.should == @now.to_i
     end
   end
 
