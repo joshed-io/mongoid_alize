@@ -24,9 +24,27 @@ module Mongoid
         # implement in subclasses
       end
 
-      def callback_attached?(klass, callback_type, callback_name)
+      def callback_attached?(callback_type, callback_name)
         !!klass.send(:"_#{callback_type}_callbacks").
           map(&:raw_filter).include?(callback_name)
+      end
+
+      def callback_defined?(callback_name)
+        klass.method_defined?(callback_name)
+      end
+
+      def alias_callback
+        unless callback_defined?(aliased_callback_name)
+          klass.send(:alias_method, aliased_callback_name, callback_name)
+        end
+      end
+
+      def callback_name
+        "_#{aliased_callback_name}"
+      end
+
+      def aliased_callback_name
+        "denormalize_#{direction}_#{relation}"
       end
 
       private

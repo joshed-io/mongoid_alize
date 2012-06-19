@@ -15,6 +15,7 @@ module Mongoid
               inverse.push(:#{prefixed_name}, data)
             end
           end
+          protected :#{callback_name}
         CALLBACK
       end
 
@@ -25,6 +26,7 @@ module Mongoid
               #{pull_from_inverse}
             end
           end
+          protected :#{destroy_callback_name}
         CALLBACK
       end
 

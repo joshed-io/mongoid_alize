@@ -5,6 +5,10 @@ class Mongoid::Alize::SpecFromCallback < Mongoid::Alize::FromCallback
   end
 
   def define_callback
+    klass.class_eval <<-CALLBACK
+      def _denormalize_from_person
+      end
+    CALLBACK
   end
 end
 
@@ -25,26 +29,16 @@ describe Mongoid::Alize::FromCallback do
     @callback = new_callback
   end
 
-  describe "#attach" do
-    it "should call define_fields" do
-      mock(@callback).define_fields
-      @callback.send(:attach)
-    end
-
-    it "should call define_callback" do
-      mock(@callback).define_callback
-      @callback.send(:attach)
-    end
-
-    it "should call set_callback" do
-      mock(@callback).set_callback
-      @callback.send(:attach)
+  describe "#set_callback" do
+    it "should set a callback on the klass" do
+      mock(@callback.klass).set_callback(:create, :before, "denormalize_from_person")
+      @callback.send(:set_callback)
     end
 
     it "should not set the callback if it's already set" do
       @callback.send(:attach)
-      dont_allow(@callback).set_callback
-      @callback.send(:attach)
+      dont_allow(@callback.klass).set_callback
+      @callback.send(:set_callback)
     end
   end
 end

@@ -33,7 +33,7 @@ describe Mongoid::Alize::Callbacks::To::OneFromOne do
     end
 
     def run_callback
-      @person.denormalize_to_head
+      @person.send(:_denormalize_to_head)
     end
 
     it "should push the fields to the relation" do
@@ -58,7 +58,7 @@ describe Mongoid::Alize::Callbacks::To::OneFromOne do
     end
 
     def run_destroy_callback
-      @person.denormalize_destroy_to_head
+      @person.send(:_denormalize_destroy_to_head)
     end
 
     it "should nillify the fields in the relation" do

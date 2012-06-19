@@ -40,7 +40,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
 
   describe "the defined callback" do
     def run_callback
-      @head.denormalize_from_wanted_by
+      @head.send(:_denormalize_from_wanted_by)
     end
 
     before do

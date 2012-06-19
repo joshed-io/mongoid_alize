@@ -35,7 +35,7 @@ RSpec.configure do |config|
           persistent_fields[Object]).include?(field.to_sym)
       end
       klass.instance_methods.each do |method|
-        if method =~ /^denormalize_/
+        if method =~ /^_?denormalize_/
           klass.send(:undef_method, method)
         end
       end

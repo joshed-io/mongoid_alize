@@ -4,34 +4,40 @@ module Mongoid
 
       def attach
         define_callback
-
-        unless callback_attached?(klass, "save", callback_name)
-          set_callback
-        end
+        alias_callback
+        set_callback
 
         define_destroy_callback
-
-        unless callback_attached?(klass, "destroy", destroy_callback_name)
-          set_destroy_callback
-        end
+        alias_destroy_callback
+        set_destroy_callback
       end
 
       protected
 
       def set_callback
-        klass.set_callback(:save, :after, callback_name)
+        unless callback_attached?("save", aliased_callback_name)
+          klass.set_callback(:save, :after, aliased_callback_name)
+        end
       end
 
       def set_destroy_callback
-        klass.set_callback(:destroy, :after, destroy_callback_name)
+        unless callback_attached?("destroy", aliased_destroy_callback_name)
+          klass.set_callback(:destroy, :after, aliased_destroy_callback_name)
+        end
       end
 
-      def callback_name
-        "denormalize_to_#{relation}"
+      def alias_destroy_callback
+        unless callback_defined?(aliased_destroy_callback_name)
+          klass.send(:alias_method, aliased_destroy_callback_name, destroy_callback_name)
+        end
+      end
+
+      def aliased_destroy_callback_name
+        "denormalize_destroy_#{direction}_#{relation}"
       end
 
       def destroy_callback_name
-        "denormalize_destroy_to_#{relation}"
+        "_#{aliased_destroy_callback_name}"
       end
 
       def plain_relation
@@ -40,6 +46,10 @@ module Mongoid
 
       def surrounded_relation
         "self.#{relation} ? [self.#{relation}] : []"
+      end
+
+      def direction
+        "to"
       end
     end
   end

@@ -52,7 +52,7 @@ describe Mongoid::Alize::Callbacks::From::One do
 
   describe "the defined callback" do
     def run_callback
-      @head.denormalize_from_person
+      @head.send(:_denormalize_from_person)
     end
 
     before do

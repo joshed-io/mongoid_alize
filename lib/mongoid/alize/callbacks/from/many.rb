@@ -16,6 +16,7 @@ module Mongoid
                   }
                 end
               end
+              protected :#{callback_name}
             CALLBACK
           end
 

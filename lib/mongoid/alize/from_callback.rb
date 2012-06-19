@@ -4,21 +4,18 @@ module Mongoid
 
       def attach
         define_fields
-        define_callback
 
-        unless callback_attached?(klass, "create", callback_name)
-          set_callback
-        end
+        define_callback
+        alias_callback
+        set_callback
       end
 
       protected
 
       def set_callback
-        klass.set_callback(:create, :before, callback_name)
-      end
-
-      def callback_name
-        "denormalize_from_#{relation}"
+        unless callback_attached?("create", aliased_callback_name)
+          klass.set_callback(:create, :before, aliased_callback_name)
+        end
       end
 
       def ensure_field_not_defined!(prefixed_name, klass)
@@ -29,6 +26,10 @@ module Mongoid
 
       def field_defined?(prefixed_name, klass)
         !!klass.fields[prefixed_name]
+      end
+
+      def direction
+        "from"
       end
     end
   end
