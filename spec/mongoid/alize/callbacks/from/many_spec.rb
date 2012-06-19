@@ -20,6 +20,12 @@ describe Mongoid::Alize::Callbacks::From::Many do
       Head.fields["wanted_by_fields"].type.should == Array
     end
 
+    it "should default the field to empty" do
+      callback = new_callback
+      callback.send(:define_fields)
+      Head.new.wanted_by_fields.should == []
+    end
+
     it "should raise an already defined field error if the field already exists" do
       Head.class_eval do
         field :wanted_by_fields
