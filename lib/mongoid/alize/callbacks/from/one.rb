@@ -24,10 +24,11 @@ module Mongoid
           def define_fields
             fields.each do |name|
               prefixed_name = prefixed_field_name(name)
-              ensure_field_not_defined!(prefixed_name, klass)
-              klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-                field :#{prefixed_name}, :type => #{inverse_field_type(name)}
-              CALLBACK
+              unless field_defined?(prefixed_name, klass)
+                klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
+                  field :#{prefixed_name}, :type => #{inverse_field_type(name)}
+                CALLBACK
+              end
             end
           end
 

@@ -20,9 +20,13 @@ module Mongoid
       end
 
       def ensure_field_not_defined!(prefixed_name, klass)
-        if klass.fields[prefixed_name]
+        if field_defined?(prefixed_name, klass)
           raise Mongoid::Alize::Errors::AlreadyDefinedField.new(prefixed_name, klass.name)
         end
+      end
+
+      def field_defined?(prefixed_name, klass)
+        !!klass.fields[prefixed_name]
       end
     end
   end

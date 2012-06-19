@@ -27,23 +27,19 @@ describe Mongoid::Alize::Callbacks::From::One do
       Head.fields["person_location"].type.should == String
     end
 
-    it "should raise an already defined field error if a field already exists" do
+    it "should not add the field if the field already exists" do
       Head.class_eval do
         field :person_name
       end
-      callback = new_callback
-      expect {
-        callback.send(:define_fields)
-      }.to raise_error(Mongoid::Alize::Errors::AlreadyDefinedField,
-                       "person_name is already defined on the Head model.")
+      callback = klass.new(Head, :person, [:name])
+      dont_allow(Head).field
+      callback.send(:define_fields)
     end
 
-    it "should raise an already defined field error if a field already exists b/c of another realtion" do
+    it "should not add the field if it already exists b/c of another relation" do
       callback = klass.new(Head, :person, [:id])
-      expect {
-        callback.send(:define_fields)
-      }.to raise_error(Mongoid::Alize::Errors::AlreadyDefinedField,
-                       "person_id is already defined on the Head model.")
+      dont_allow(Head).field
+      callback.send(:define_fields)
     end
 
     it "should allow the id and type of the inverse to be denormalized without an extra _" do
