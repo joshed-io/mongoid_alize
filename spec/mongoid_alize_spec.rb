@@ -37,6 +37,13 @@ describe Mongoid::Alize do
         assert_head
       end
 
+      it "should not pull data from an unchanged person on save" do
+        @head.save!
+        @head.person_name = "Cowboy"
+        @head.save!
+        @head.person_name.should == "Cowboy"
+      end
+
       it "should push data to head" do
         @person.update_attributes!(:name => @name = "Bill")
         assert_head
@@ -244,6 +251,33 @@ describe Mongoid::Alize do
     it "should be possible to define a method before alize and call the alize version within it" do
       @person.update_attributes!(:name => @name = "Bill")
       @head.person_name.should == "Overrider"
+    end
+  end
+
+  describe "forcing denormalization" do
+    before do
+      Head.send(:alize, :person, *person_fields)
+      @head.person = @person
+      @head.save!
+    end
+
+    it "should allow using the force flag to force denormalization" do
+      class Head
+        def denormalize_from_person
+          _denormalize_from_person(true)
+        end
+      end
+
+      @head.person_name = "Misty"
+      @head.save!
+      @head.person_name.should == @name
+    end
+
+    it "should allow using the force_denormalization attribute to force denormalization" do
+      @head.person_name = "Misty"
+      @head.force_denormalization = true
+      @head.save!
+      @head.person_name.should == @name
     end
   end
 end
