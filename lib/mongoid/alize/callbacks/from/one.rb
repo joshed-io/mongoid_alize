@@ -9,13 +9,18 @@ module Mongoid
           def define_callback
             field_sets = ""
             fields.each do |name|
-              field_sets << "self.send(:#{prefixed_field_name(name)}=, relation && relation.send(:#{name}))\n"
+              field_sets << "self.send(:#{prefixed_field_name(name)}=,
+                               relation && relation.send(:#{name}))\n"
             end
 
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               def #{callback_name}
-                relation = self.#{relation}
-                #{field_sets}
+                if #{!reflect.stores_foreign_key?} ||
+                    self.#{reflect.key}.nil? ||
+                    self.#{reflect.key}_changed?
+                  relation = self.#{relation}
+                  #{field_sets}
+                end
                 true
               end
 

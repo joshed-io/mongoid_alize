@@ -56,17 +56,20 @@ describe Mongoid::Alize::Callbacks::From::One do
     end
 
     before do
-      @head = Head.create(
-        :person => @person = Person.create(:name => @name = "Bob",
-                                           :created_at => @now = Time.now))
+      @head = Head.create
+      @person = Person.create(:name => @name = "Bob",
+                              :created_at => @now = Time.now)
+
       @callback = new_callback
       @callback.send(:define_fields)
       @callback.send(:define_callback)
-    end
 
-    it "should set pull fields from the relation" do
       @head.person_name.should be_nil
       @head.person_created_at.should be_nil
+    end
+
+    it "should set fields from the relation" do
+      @head.person = @person
       run_callback
       @head.person_name.should == @name
       @head.person_created_at.to_i.should == @now.to_i
@@ -80,6 +83,77 @@ describe Mongoid::Alize::Callbacks::From::One do
       run_callback
       @head.person_name.should be_nil
       @head.person_created_at.should be_nil
+    end
+
+    describe "on save" do
+      before do
+        @head.person = @person
+        @head.save!
+        @person_2 = Person.create(:name => "Bill")
+      end
+
+      it "should run if the relation has changed" do
+        @head.person = @person_2
+        run_callback
+        @head.person_name.should == "Bill"
+      end
+
+      it "should run if the relation key is nil" do
+        @head.person = nil
+        mock.proxy(@head).person
+        run_callback
+      end
+
+      it "should not run if the relation has not changed" do
+        @head.person = @person_2
+        @head.save!
+        dont_allow(@head).person
+        run_callback
+      end
+    end
+  end
+
+  describe "the defined callback when denormalizing on the has_one side" do
+    def run_callback
+      @person.send(:_denormalize_from_head)
+    end
+
+    before do
+      @person = Person.create
+      @head = Head.create(:size => 5)
+
+      @callback = klass.new(Person, :head, [:size])
+      @callback.send(:define_fields)
+      @callback.send(:define_callback)
+
+      @person.head_size.should be_nil
+    end
+
+    describe "on save" do
+      before do
+        @person.head = @head
+        @person.save!
+        @head_2 = Head.create(:size => 10)
+      end
+
+      it "should run if the relation has changed" do
+        @person.head = @head_2
+        run_callback
+        @person.head_size.should == 10
+      end
+
+      it "should run if the relation key is nil" do
+        @person.head = nil
+        mock.proxy(@person).head
+        run_callback
+      end
+
+      it "should run even if the relation has not changed" do
+        @person.head = @head_2
+        @person.save!
+        mock.proxy(@person).head
+        run_callback
+      end
     end
   end
 end

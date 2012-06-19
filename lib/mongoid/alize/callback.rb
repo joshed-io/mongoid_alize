@@ -6,6 +6,7 @@ module Mongoid
 
       attr_accessor :klass
       attr_accessor :relation
+      attr_accessor :reflect
 
       attr_accessor :inverse_klass
       attr_accessor :inverse_relation
@@ -15,9 +16,9 @@ module Mongoid
         self.relation = _relation
         self.fields = _fields
 
-        reflect = _klass.relations[_relation.to_s]
-        self.inverse_klass = reflect.klass
-        self.inverse_relation = reflect.inverse
+        self.reflect = _klass.relations[_relation.to_s]
+        self.inverse_klass = self.reflect.klass
+        self.inverse_relation = self.reflect.inverse
       end
 
       def attach

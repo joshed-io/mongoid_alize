@@ -13,8 +13,8 @@ module Mongoid
       protected
 
       def set_callback
-        unless callback_attached?("create", aliased_callback_name)
-          klass.set_callback(:create, :before, aliased_callback_name)
+        unless callback_attached?("save", aliased_callback_name)
+          klass.set_callback(:save, :before, aliased_callback_name)
         end
       end
 
