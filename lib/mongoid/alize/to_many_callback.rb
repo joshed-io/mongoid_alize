@@ -4,32 +4,40 @@ module Mongoid
       protected
 
       def define_callback
-        _callback(callback_name,
-                  "inverse.push(:#{prefixed_name}, self.attributes.slice(#{joined_fields}))")
+        klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
+          def #{callback_name}
+            data = [#{joined_fields}].inject({}) { |hash, name|
+              hash[name] = self.send(name)
+              hash
+            }
+            (#{iterable_relation}).each do |inverse|
+              #{pull_from_inverse}
+              inverse.push(:#{prefixed_name}, data)
+            end
+          end
+        CALLBACK
       end
 
       def define_destroy_callback
-        _callback(destroy_callback_name)
+        klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
+          def #{destroy_callback_name}
+            (#{iterable_relation}).each do |inverse|
+              #{pull_from_inverse}
+            end
+          end
+        CALLBACK
       end
 
-      def _callback(_callback_name, push_content="")
-        klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-          def #{_callback_name}
+      def pull_from_inverse
+        <<-CALLBACK
+          # this pull works in the DB, but not in memory
+          # ($pull w/ expression not currently supported by Mongoid)
+          inverse.pull(:#{prefixed_name}, { "_id" => self.id })
 
-            (#{iterable_relation}).each do |inverse|
-
-              # this pull works in the DB, but not in memory
-              # ($pull w/ expression not currently supported by Mongoid)
-              inverse.pull(:#{prefixed_name}, { "_id" => self.id })
-
-              # manually do the pull in memory for now
-              if inverse.#{prefixed_name}
-                inverse.#{prefixed_name}.reject! do |hash|
-                  hash["_id"] == self.id
-                end
-              end
-
-              #{push_content}
+          # manually do the pull in memory for now
+          if inverse.#{prefixed_name}
+            inverse.#{prefixed_name}.reject! do |hash|
+              hash["_id"] == self.id
             end
           end
         CALLBACK

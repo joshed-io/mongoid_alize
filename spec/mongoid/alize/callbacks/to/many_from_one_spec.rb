@@ -6,7 +6,7 @@ describe Mongoid::Alize::Callbacks::To::ManyFromOne do
   end
 
   def args
-    [Person, :seen_by, [:name, :created_at]]
+    [Person, :seen_by, [:name, :location, :created_at]]
   end
 
   def new_callback
@@ -16,6 +16,7 @@ describe Mongoid::Alize::Callbacks::To::ManyFromOne do
   def sees_fields
     { "_id" => @person.id,
       "name"=> "Bob",
+      "location" => "Paris",
       "created_at"=> @now.to_s(:utc) }
   end
 

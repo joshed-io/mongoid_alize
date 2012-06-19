@@ -6,7 +6,7 @@ describe Mongoid::Alize::Callbacks::To::OneFromOne do
   end
 
   def args
-    [Person, :head, [:name, :created_at]]
+    [Person, :head, [:name, :location, :created_at]]
   end
 
   def new_callback
@@ -16,6 +16,7 @@ describe Mongoid::Alize::Callbacks::To::OneFromOne do
   before do
     Head.class_eval do
       field :person_name, :type => String
+      field :person_location, :type => String
       field :person_created_at, :type => Time
     end
 
@@ -37,9 +38,11 @@ describe Mongoid::Alize::Callbacks::To::OneFromOne do
 
     it "should push the fields to the relation" do
       @head.person_name.should be_nil
+      @head.person_location.should be_nil
       @head.person_created_at.should be_nil
       run_callback
       @head.person_name.should == "Bob"
+      @head.person_location.should == "Paris"
       @head.person_created_at.to_i.should == @now.to_i
     end
 
@@ -60,9 +63,11 @@ describe Mongoid::Alize::Callbacks::To::OneFromOne do
 
     it "should nillify the fields in the relation" do
       @head.person_name = "Chuck"
+      @head.person_location = "Paris"
       @head.person_created_at = Time.now
       run_destroy_callback
       @head.person_name.should be_nil
+      @head.person_location.should be_nil
       @head.person_created_at.should be_nil
     end
 

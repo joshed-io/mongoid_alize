@@ -6,7 +6,7 @@ describe Mongoid::Alize::Callbacks::To::OneFromMany do
   end
 
   def args
-    [Person, :heads, [:name, :created_at]]
+    [Person, :heads, [:name, :location, :created_at]]
   end
 
   def new_callback
@@ -16,6 +16,7 @@ describe Mongoid::Alize::Callbacks::To::OneFromMany do
   before do
     Head.class_eval do
       field :captor_name, :type => String
+      field :captor_location, :type => String
       field :captor_created_at, :type => Time
     end
 
@@ -38,9 +39,11 @@ describe Mongoid::Alize::Callbacks::To::OneFromMany do
 
     it "should push the fields to the relation" do
       @head.captor_name.should be_nil
+      @head.captor_location.should be_nil
       @head.captor_created_at.should be_nil
       run_callback
       @head.captor_name.should == "Bob"
+      @head.captor_location.should == "Paris"
       @head.captor_created_at.to_i.should == @now.to_i
     end
   end
@@ -55,10 +58,12 @@ describe Mongoid::Alize::Callbacks::To::OneFromMany do
     end
 
     it "should remove the fields from the relation" do
-      @head.captor_name.should be_nil
-      @head.captor_created_at.should be_nil
+      @head.captor_name = "Chuck"
+      @head.captor_location = "Paris"
+      @head.captor_created_at = Time.now
       run_destroy_callback
       @head.captor_name.should be_nil
+      @head.captor_location.should be_nil
       @head.captor_created_at.should be_nil
     end
   end

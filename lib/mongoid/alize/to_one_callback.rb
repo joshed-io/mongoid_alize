@@ -13,7 +13,7 @@ module Mongoid
 
       def to_one_field_sets
         fields.map { |field|
-          "relation.set(:#{prefixed_field_name(field)}, self.read_attribute(:#{field}))"
+          "relation.set(:#{prefixed_field_name(field)}, self.send(:#{field}))"
         }.join("\n")
       end
 

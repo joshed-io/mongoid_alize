@@ -6,7 +6,7 @@ describe Mongoid::Alize::Callbacks::To::ManyFromMany do
   end
 
   def args
-    [Person, :wants, [:name, :created_at]]
+    [Person, :wants, [:name, :location, :created_at]]
   end
 
   def new_callback
@@ -15,7 +15,8 @@ describe Mongoid::Alize::Callbacks::To::ManyFromMany do
 
   def wanted_by_fields
     { "_id" => @person.id,
-        "name"=> "Bob",
+        "name" => "Bob",
+        "location" => "Paris",
         "created_at"=> @now.to_s(:utc) }
   end
 

@@ -25,12 +25,12 @@ describe Mongoid::Alize do
         @head.person_name.should == @name
       end
 
-      it "should pull attributes from person" do
+      it "should pull data from person" do
         @head.save!
         assert_head
       end
 
-      it "should push attributes to head" do
+      it "should push data to head" do
         @person.update_attributes!(:name => @name = "Bill")
         assert_head
       end
@@ -52,12 +52,12 @@ describe Mongoid::Alize do
         @person.head_size.should == @size
       end
 
-      it "should pull attributes from head" do
+      it "should pull data from head" do
         @person.save!
         assert_person
       end
 
-      it "should push attributes to person" do
+      it "should push data to person" do
         @head.update_attributes!(:size => @size = "20lbs")
         assert_person
       end
@@ -81,12 +81,12 @@ describe Mongoid::Alize do
         @head.captor_name.should == @name
       end
 
-      it "should pull attributes from head" do
+      it "should pull data from head" do
         @head.save!
         assert_captor
       end
 
-      it "should push attributes to person" do
+      it "should push data to person" do
         @person.update_attributes!(:name => @name = "Bill")
         assert_captor
       end
@@ -110,12 +110,12 @@ describe Mongoid::Alize do
           "name" => @name }]
       end
 
-      it "should pull attributes from sees" do
+      it "should pull data from sees" do
         @head.save!
         assert_sees
       end
 
-      it "should push attributes to seen_by" do
+      it "should push data to seen_by" do
         @person.update_attributes!(:name => @name = "Bill")
         assert_sees
       end
@@ -142,13 +142,13 @@ describe Mongoid::Alize do
           "name" => @name }]
       end
 
-      it "should pull attributes from wanted_by" do
+      it "should pull data from wanted_by" do
         @head.wanted_by = [@person]
         @head.save!
         assert_wanted_by
       end
 
-      it "should push attributes to wanted_by" do
+      it "should push data to wanted_by" do
         @person.wants = [@head]
         @person.update_attributes!(:name => @name = "Bill")
         assert_wanted_by
