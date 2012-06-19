@@ -12,8 +12,6 @@ group :development, :test do
   gem 'ruby_gntp'
   # only load these on OSX
   gem 'rb-fsevent', :require => (RUBY_PLATFORM.include?('darwin') and 'rb-fsevent')
-  # readline gives a prompt and history for guard command line
-  gem 'rb-readline', :require => (RUBY_PLATFORM.include?('darwin') and 'rb-fsevent')
 
   # irb goodies
   gem 'awesome_print'
