@@ -19,11 +19,16 @@ module Mongoid
         self.reflect = _klass.relations[_relation.to_s]
         self.inverse_klass = self.reflect.klass
         self.inverse_relation = self.reflect.inverse
+
+        self.klass.send(:attr_accessor, :force_denormalization)
+        self.inverse_klass.send(:attr_accessor, :force_denormalization)
       end
 
       def attach
         # implement in subclasses
       end
+
+      protected
 
       def callback_attached?(callback_type, callback_name)
         !!klass.send(:"_#{callback_type}_callbacks").
@@ -48,10 +53,25 @@ module Mongoid
         "denormalize_#{direction}_#{relation}"
       end
 
-      private
-
       def joined_fields
         (fields + [:_id]).map {|f| "'#{f}'" }.join(", ")
+      end
+
+      def joined_field_values(source)
+        <<-RUBY
+          [#{joined_fields}].inject({}) { |hash, name|
+            hash[name] = #{source}.send(name)
+            hash
+          }
+        RUBY
+      end
+
+      def force_param
+        "(force=false)"
+      end
+
+      def force_check
+        "force || self.force_denormalization"
       end
     end
   end

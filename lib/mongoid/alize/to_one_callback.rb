@@ -25,7 +25,7 @@ module Mongoid
 
       def _callback(_callback_name, field_sets)
         klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-          def #{_callback_name}
+          def #{_callback_name}#{force_param}
             (#{iterable_relation}).each do |relation|
               #{field_sets}
             end

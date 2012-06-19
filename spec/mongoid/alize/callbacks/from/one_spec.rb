@@ -51,8 +51,8 @@ describe Mongoid::Alize::Callbacks::From::One do
   end
 
   describe "the defined callback" do
-    def run_callback
-      @head.send(:_denormalize_from_person)
+    def run_callback(force=false)
+      @head.send(:_denormalize_from_person, force)
     end
 
     before do
@@ -88,6 +88,19 @@ describe Mongoid::Alize::Callbacks::From::One do
     it "should not run if the relation has not changed" do
       @head.should_not be_person_id_changed
       dont_allow(@head).person
+      run_callback
+    end
+
+    it "should still run if the relation has not changed but force is passed" do
+      @head.should_not be_person_id_changed
+      mock.proxy(@head).person
+      run_callback(true)
+    end
+
+    it "should still run if the relation has not changed but force_denormalization is set on the class" do
+      @head.should_not be_person_id_changed
+      @head.force_denormalization = true
+      mock.proxy(@head).person
       run_callback
     end
   end

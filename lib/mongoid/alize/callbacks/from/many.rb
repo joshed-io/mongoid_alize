@@ -8,12 +8,9 @@ module Mongoid
 
           def define_callback
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-              def #{callback_name}
+              def #{callback_name}#{force_param}
                 self.#{prefixed_name} = self.#{relation}.map do |model|
-                  [#{joined_fields}].inject({}) { |hash, name|
-                    hash[name] = model.send(name)
-                    hash
-                  }
+                  #{joined_field_values("model")}
                 end
               end
               protected :#{callback_name}

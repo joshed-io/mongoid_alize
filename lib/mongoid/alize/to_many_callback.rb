@@ -5,11 +5,8 @@ module Mongoid
 
       def define_callback
         klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-          def #{callback_name}
-            data = [#{joined_fields}].inject({}) { |hash, name|
-              hash[name] = self.send(name)
-              hash
-            }
+          def #{callback_name}#{force_param}
+            data = #{joined_field_values("self")}
             (#{iterable_relation}).each do |inverse|
               #{pull_from_inverse}
               inverse.push(:#{prefixed_name}, data)

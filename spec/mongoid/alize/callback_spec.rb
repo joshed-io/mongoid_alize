@@ -35,6 +35,12 @@ describe Mongoid::Alize::Callback do
       callback.inverse_relation = :head
       callback.fields.should == [:name, :created_at]
     end
+
+    it "should add force_denormalization attribute to klass and inverse klass" do
+      callback = new_callback
+      Head.new.force_denormalization = true
+      Person.new.force_denormalization = true
+    end
   end
 
   describe "with callback " do
