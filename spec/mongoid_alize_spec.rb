@@ -25,7 +25,14 @@ describe Mongoid::Alize do
         @head.person_name.should == @name
       end
 
-      it "should pull data from person" do
+      it "should pull data from person on create" do
+        @head.save!
+        assert_head
+      end
+
+      it "should pull data from a changed person on save" do
+        @head.save!
+        @head.person = Person.create(:name => @name = "Bill")
         @head.save!
         assert_head
       end
@@ -52,7 +59,14 @@ describe Mongoid::Alize do
         @person.head_size.should == @size
       end
 
-      it "should pull data from head" do
+      it "should pull data from head on create" do
+        @person.save!
+        assert_person
+      end
+
+      it "should pull data from head on save" do
+        @person.save!
+        @person.head = Head.create(:size => @size = 18)
         @person.save!
         assert_person
       end
@@ -81,7 +95,14 @@ describe Mongoid::Alize do
         @head.captor_name.should == @name
       end
 
-      it "should pull data from head" do
+      it "should pull data from captor on create" do
+        @head.save!
+        assert_captor
+      end
+
+      it "should pull data from captor on save" do
+        @head.save!
+        @head.captor = Person.create(:name => @name = "Bill")
         @head.save!
         assert_captor
       end
@@ -91,7 +112,7 @@ describe Mongoid::Alize do
         assert_captor
       end
 
-      it "should nillify captor fieds when person is destroyed" do
+      it "should nillify captor fields when person is destroyed" do
         @head.update_attributes!(:captor_name => "Old Gregg")
         @person.destroy
         @head.captor_name.should be_nil
@@ -110,7 +131,14 @@ describe Mongoid::Alize do
           "name" => @name }]
       end
 
-      it "should pull data from sees" do
+      it "should pull data from sees on create" do
+        @head.save!
+        assert_sees
+      end
+
+      it "should pull data from a sees on save" do
+        @head.save!
+        @head.sees = [@person = Person.create(:name => @name = "Bill")]
         @head.save!
         assert_sees
       end
@@ -142,13 +170,21 @@ describe Mongoid::Alize do
           "name" => @name }]
       end
 
-      it "should pull data from wanted_by" do
+      it "should pull data from wanted_by on create" do
         @head.wanted_by = [@person]
         @head.save!
         assert_wanted_by
       end
 
-      it "should push data to wanted_by" do
+      it "should pull data from wanted_by on save" do
+        @head.save!
+        @person = Person.create(:name => @name = "Bill")
+        @head.wanted_by = [@person]
+        @head.save!
+        assert_wanted_by
+      end
+
+      it "should push data to wants" do
         @person.wants = [@head]
         @person.update_attributes!(:name => @name = "Bill")
         assert_wanted_by
