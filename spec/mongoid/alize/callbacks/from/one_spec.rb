@@ -64,52 +64,31 @@ describe Mongoid::Alize::Callbacks::From::One do
       @callback.send(:define_fields)
       @callback.send(:define_callback)
 
-      @head.person_name.should be_nil
-      @head.person_created_at.should be_nil
+      @head.relations["person"].should be_stores_foreign_key
     end
 
-    it "should set fields from the relation" do
+    it "should set fields from a changed relation" do
       @head.person = @person
+      @head.should be_person_id_changed
       run_callback
       @head.person_name.should == @name
       @head.person_created_at.to_i.should == @now.to_i
       @head.person_location.should == "Paris"
     end
 
-    it "should assign nil values if the relation is nil" do
-      @head.person_name = "not nil"
-      @head.person_created_at = Time.now
+    it "should assign nil values if the changed relation is nil" do
+      @head.person = @person
+      @head.save!
       @head.person = nil
+      @head.should be_person_id_changed
       run_callback
       @head.person_name.should be_nil
-      @head.person_created_at.should be_nil
     end
 
-    describe "on save" do
-      before do
-        @head.person = @person
-        @head.save!
-        @person_2 = Person.create(:name => "Bill")
-      end
-
-      it "should run if the relation has changed" do
-        @head.person = @person_2
-        run_callback
-        @head.person_name.should == "Bill"
-      end
-
-      it "should run if the relation key is nil" do
-        @head.person = nil
-        mock.proxy(@head).person
-        run_callback
-      end
-
-      it "should not run if the relation has not changed" do
-        @head.person = @person_2
-        @head.save!
-        dont_allow(@head).person
-        run_callback
-      end
+    it "should not run if the relation has not changed" do
+      @head.should_not be_person_id_changed
+      dont_allow(@head).person
+      run_callback
     end
   end
 
@@ -126,34 +105,26 @@ describe Mongoid::Alize::Callbacks::From::One do
       @callback.send(:define_fields)
       @callback.send(:define_callback)
 
+      @person.relations["head"].should_not be_stores_foreign_key
+    end
+
+    it "should set values from a changed relation" do
+      @person.head = @head
+      run_callback
+      @person.head_size.should == 5
+    end
+
+    it "should set values from a a nil relation" do
+      @person.head = @head
+      @person.save!
+      @person.head = nil
+      run_callback
       @person.head_size.should be_nil
     end
 
-    describe "on save" do
-      before do
-        @person.head = @head
-        @person.save!
-        @head_2 = Head.create(:size => 10)
-      end
-
-      it "should run if the relation has changed" do
-        @person.head = @head_2
-        run_callback
-        @person.head_size.should == 10
-      end
-
-      it "should run if the relation key is nil" do
-        @person.head = nil
-        mock.proxy(@person).head
-        run_callback
-      end
-
-      it "should run even if the relation has not changed" do
-        @person.head = @head_2
-        @person.save!
-        mock.proxy(@person).head
-        run_callback
-      end
+    it "should run even if the relation has not changed" do
+      mock.proxy(@person).head
+      run_callback
     end
   end
 end

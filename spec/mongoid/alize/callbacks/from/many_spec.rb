@@ -43,11 +43,20 @@ describe Mongoid::Alize::Callbacks::From::Many do
       @head.send(:_denormalize_from_wanted_by)
     end
 
-    before do
-      @head = Head.create(
-        :wanted_by => [@person = Person.create(:name => "Bob",
-                                        :created_at => @now = Time.now)])
+    def bob_fields
+      { "_id" => @person.id,
+        "name"=> "Bob",
+        "location" => "Paris",
+        "created_at"=> @now.to_s(:utc) }
+    end
 
+    before do
+      now = Time.now
+      stub(Time).now { now }
+      @head = Head.create
+      @person = Person.create(:name => "Bob", :created_at => @now = Time.now)
+
+      @head.relations["wanted_by"].should be_stores_foreign_key
     end
 
     describe "valid fields" do
@@ -57,15 +66,17 @@ describe Mongoid::Alize::Callbacks::From::Many do
         @callback.send(:define_callback)
       end
 
-      it "should pull the fields from the relation" do
-        @head.wanted_by_fields.should be_nil
+      it "should set fields from a changed relation" do
+        @head.wanted_by_ids << @person.id
+        @head.should be_wanted_by_ids_changed
         run_callback
-        @head.wanted_by_fields.should == [{
-          "_id" => @person.id,
-          "name"=> "Bob",
-          "location" => "Paris",
-          "created_at"=> @now.to_s(:utc)
-        }]
+        @head.wanted_by_fields.should == [bob_fields]
+      end
+
+      it "should not set fields there are no changes" do
+        @head.should_not be_wanted_by_ids_changed
+        dont_allow(@head).wanted_by
+        run_callback
       end
     end
 
@@ -77,11 +88,40 @@ describe Mongoid::Alize::Callbacks::From::Many do
       end
 
       it "should raise a no method error" do
+        @head.wanted_by_ids << @person.id
         @head.wanted_by_fields.should be_nil
         expect {
           run_callback
         }.to raise_error NoMethodError
       end
+    end
+  end
+
+  describe "in a one to many case" do
+    def run_callback
+      @head.send(:_denormalize_from_sees)
+    end
+
+    before do
+      now = Time.now
+      stub(Time).now { now }
+      @head = Head.create
+      @person = Person.create(:name => "Bob")
+
+      @callback = klass.new(Head, :sees, [:name])
+      @callback.send(:define_fields)
+      @callback.send(:define_callback)
+
+      @head.relations["sees"].should_not be_stores_foreign_key
+    end
+
+    it "should field from a changed relation" do
+      @head.sees << @person
+      run_callback
+      @head.sees_fields.should == [{
+        "_id" => @person.id,
+        "name" => "Bob"
+      }]
     end
   end
 end

@@ -16,7 +16,6 @@ module Mongoid
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               def #{callback_name}
                 if #{!reflect.stores_foreign_key?} ||
-                    self.#{reflect.key}.nil? ||
                     self.#{reflect.key}_changed?
                   relation = self.#{relation}
                   #{field_sets}
