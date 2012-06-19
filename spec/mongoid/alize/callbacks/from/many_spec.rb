@@ -73,9 +73,9 @@ describe Mongoid::Alize::Callbacks::From::Many do
         @head.wanted_by_fields.should == [bob_fields]
       end
 
-      it "should not set fields there are no changes" do
+      it "should still set fields there are no changes" do
         @head.should_not be_wanted_by_ids_changed
-        dont_allow(@head).wanted_by
+        mock.proxy(@head).wanted_by
         run_callback
       end
     end
