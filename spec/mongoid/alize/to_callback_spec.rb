@@ -33,6 +33,27 @@ describe Mongoid::Alize::ToCallback do
     @callback = new_callback
   end
 
+  describe "names" do
+    it "should assign a destroy callback name" do
+      @callback.destroy_callback_name.should == "_denormalize_destroy_to_head"
+    end
+
+    it "should assign an aliased destroy callback name" do
+      @callback.aliased_destroy_callback_name.should == "denormalize_destroy_to_head"
+    end
+
+    it "should assign a prefixed name from the inverse" do
+      @callback.prefixed_name.should == "person_fields"
+    end
+  end
+
+  describe "#define_fields" do
+    it "should define the fields method" do
+      mock(@callback).define_fields_method
+      @callback.send(:define_fields)
+    end
+  end
+
   describe "#set_callback" do
     it "should set a callback on the klass" do
       mock(@callback.klass).set_callback(:save, :after, "denormalize_to_head")

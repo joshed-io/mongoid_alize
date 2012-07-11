@@ -20,7 +20,23 @@ class Head
   # a relation with no inverse
   has_many :admirer, :class_name => "Person", :inverse_of => nil
 
+  # a polymorphic one-to-one relation
+  belongs_to :nearest, :polymorphic => true
+
+  # a polymorphic one-to-many relation
+  has_many :below, :class_name => "Person", :as => :above
+
   def density
     "low"
+  end
+
+  # example of one way to handling attribute selection
+  # for polymorphic associations or generally using the proc fields option
+  def alize_fields(inverse)
+    if inverse.is_a?(Person)
+      [:name, :location]
+    else
+      [:id]
+    end
   end
 end

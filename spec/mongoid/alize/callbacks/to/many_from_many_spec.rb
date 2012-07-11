@@ -24,30 +24,33 @@ describe Mongoid::Alize::Callbacks::To::ManyFromMany do
     { "_id" => "SomeObjectId" }
   end
 
-  before do
-    Head.class_eval do
-      field :wanted_by_fields, type: Array
-    end
-
+  def create_models
     @head = Head.create(
       :wanted_by => [@person = Person.create(:name => "Bob",
                                       :created_at => @now = Time.now)])
     @person.wants = [@head]
+  end
 
-    @callback = new_callback
+  before do
+    Head.class_eval do
+      field :wanted_by_fields, type: Array, :default => []
+    end
   end
 
   describe "#define_callback" do
-    before do
-      @callback.send(:define_callback)
-    end
-
     def run_callback
       @person.send(:_denormalize_to_wants)
     end
 
+    before do
+      @callback = new_callback
+      @callback.send(:define_fields)
+      create_models
+      @callback.send(:define_callback)
+    end
+
     it "should push the fields to the relation" do
-      @head.wanted_by_fields.should be_nil
+      @head.wanted_by_fields.should == []
       run_callback
       @head.wanted_by_fields.should == [wanted_by_fields]
     end
@@ -67,12 +70,15 @@ describe Mongoid::Alize::Callbacks::To::ManyFromMany do
   end
 
   describe "#define_destroy_callback" do
-    before do
-      @callback.send(:define_destroy_callback)
-    end
-
     def run_destroy_callback
       @person.send(:_denormalize_destroy_to_wants)
+    end
+
+    before do
+      @callback = new_callback
+      @callback.send(:define_fields)
+      create_models
+      @callback.send(:define_destroy_callback)
     end
 
     it "should pull first any existing array entries matching the _id" do

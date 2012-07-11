@@ -9,10 +9,12 @@ module Mongoid
           def define_callback
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               def #{callback_name}#{force_param}
-                self.#{prefixed_name} = self.#{relation}.map do |model|
-                  #{joined_field_values("model")}
+                self.#{prefixed_name} = self.#{relation}.map do |relation|
+                  #{field_values("relation", :id => true)}
                 end
+                true
               end
+
               protected :#{callback_name}
             CALLBACK
           end
@@ -22,10 +24,8 @@ module Mongoid
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               field :#{prefixed_name}, :type => Array, :default => []
             CALLBACK
-          end
 
-          def prefixed_name
-            "#{relation}_fields"
+            define_fields_method
           end
         end
       end

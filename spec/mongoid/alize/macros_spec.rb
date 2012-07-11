@@ -39,6 +39,14 @@ describe Mongoid::Alize::Macros do
       end
     end
 
+    describe "with a polymorphic association" do
+      it "should not attach a callback to the inverse" do
+        Head.relations["nearest"].should be_polymorphic
+        dont_allow(Mongoid::Alize::Callbacks::To::OneFromOne).new
+        Head.alize(:nearest)
+      end
+    end
+
     describe "fields" do
       describe "with fields supplied" do
         it "should use them" do
@@ -49,16 +57,30 @@ describe Mongoid::Alize::Macros do
 
       describe "with no fields supplied" do
         it "should use the default alize fields" do
-          mock(Head).default_alize_fields(:person) { [:name] }
+          mock(Head).default_alize_fields(anything) { [:name] }
           Head.alize(:person)
+        end
+      end
+
+      describe "with a block supplied" do
+        it "should use the block supplied as fields in the options hash" do
+          blk = lambda {}
+          mock.proxy(Mongoid::Alize::Callbacks::From::One).new(
+            Head, :person, blk)
+          Head.alize(:person, :fields => blk)
         end
       end
     end
 
     describe "default_alize_fields" do
       it "should return an array of all non-internal field names (e.g. not _type or _id)" do
-        Head.default_alize_fields(:person).should ==
+        Head.default_alize_fields(Head.relations["person"]).should ==
           ["name", "created_at", "want_ids", "seen_by_id"]
+      end
+
+      it "should be empty for a polymorphic association" do
+        Head.default_alize_fields(Head.relations["nearest"]).should ==
+          []
       end
     end
   end

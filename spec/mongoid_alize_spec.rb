@@ -24,8 +24,10 @@ describe Mongoid::Alize do
       end
 
       def assert_head
-        @head.person_name.should == @name
-        @head.person_location.should == "Paris"
+        @head.person_fields.should == {
+          "name" => @name,
+          "location" => "Paris"
+        }
       end
 
       it "should pull data from person on create" do
@@ -42,9 +44,9 @@ describe Mongoid::Alize do
 
       it "should not pull data from an unchanged person on save" do
         @head.save!
-        @head.person_name = "Cowboy"
+        @head.person_fields["name"] = "Cowboy"
         @head.save!
-        @head.person_name.should == "Cowboy"
+        @head.person_fields["name"].should == "Cowboy"
       end
 
       it "should push data to head" do
@@ -53,10 +55,9 @@ describe Mongoid::Alize do
       end
 
       it "should nillify person fields in head when person is destroyed" do
-        @head.update_attributes!(:person_name => "Old Gregg")
+        @head.update_attributes!(:person_fields => { "name" => "Old Gregg", "location" => "Paris" })
         @person.destroy
-        @head.person_name.should be_nil
-        @head.person_location.should be_nil
+        @head.person_fields.should == {}
       end
     end
 
@@ -67,7 +68,7 @@ describe Mongoid::Alize do
       end
 
       def assert_person
-        @person.head_size.should == @size
+        @person.head_fields.should == { "size" => @size }
       end
 
       it "should pull data from head on create" do
@@ -88,9 +89,9 @@ describe Mongoid::Alize do
       end
 
       it "should nillify head fields in person when head is destroyed" do
-        @person.update_attributes!(:head_size => "1000 balloons")
+        @person.update_attributes!(:head_fields => { "size" => "1000 balloons"})
         @head.destroy
-        @person.head_size.should be_nil
+        @person.head_fields.should == {}
       end
     end
   end
@@ -103,7 +104,7 @@ describe Mongoid::Alize do
       end
 
       def assert_captor
-        @head.captor_name.should == @name
+        @head.captor_fields.should == { "name" => @name, "location" => "Paris" }
       end
 
       it "should pull data from captor on create" do
@@ -124,9 +125,9 @@ describe Mongoid::Alize do
       end
 
       it "should nillify captor fields when person is destroyed" do
-        @head.update_attributes!(:captor_name => "Old Gregg")
+        @head.update_attributes!(:captor => { "name" => "Old Gregg"})
         @person.destroy
-        @head.captor_name.should be_nil
+        @head.captor_fields.should == {}
       end
     end
 
@@ -223,8 +224,12 @@ describe Mongoid::Alize do
 
     it "should denormalize all non-internal fields" do
       @head.save!
-      @head.person_name.should == @name
-      @head.person_created_at.to_i.should == @now.to_i
+      @head.person_fields.should == {
+        "name" => @name,
+        "created_at" => @person.created_at,
+        "seen_by_id" => nil,
+        "want_ids" => []
+      }
     end
   end
 
@@ -249,7 +254,7 @@ describe Mongoid::Alize do
 
     it "should be possible to define a method before alize and call the alize version within it" do
       @head.save!
-      @head.person_name.should == "Overrider"
+      @head.person_fields["name"].should == "Overrider"
     end
   end
 
@@ -269,7 +274,7 @@ describe Mongoid::Alize do
 
     it "should be possible to define a method before alize and call the alize version within it" do
       @person.update_attributes!(:name => @name = "Bill")
-      @head.person_name.should == "Overrider"
+      @head.person_fields["name"].should == "Overrider"
     end
   end
 
@@ -287,16 +292,115 @@ describe Mongoid::Alize do
         end
       end
 
-      @head.person_name = "Misty"
+      @head.person_fields["name"] = "Misty"
       @head.save!
-      @head.person_name.should == @name
+      @head.person_fields["name"] = @name
     end
 
     it "should allow using the force_denormalization attribute to force denormalization" do
-      @head.person_name = "Misty"
+      @head.person_fields["name"] = "Misty"
       @head.force_denormalization = true
       @head.save!
-      @head.person_name.should == @name
+      @head.person_fields["name"] = @name
+    end
+  end
+
+  describe "using a proc to define fields" do
+    before do
+      Head.send(:alize, :person, :fields => lambda { |inverse|
+        self.alize_fields(inverse) })
+      @head.person = @person
+    end
+
+    def assert_head
+      @head.person_fields.should == {
+        "name" => @name,
+        "location" => "Paris"
+      }
+    end
+
+    it "should work the same way as it does with fields specified" do
+      @head.save!
+      assert_head
+    end
+  end
+
+  describe "using a proc to define fields for a one-to-one polymorphic association from the belongs to side" do
+    before do
+      Head.send(:alize, :nearest, :fields => lambda { |inverse|
+        self.alize_fields(inverse) })
+      @head.nearest = @person
+    end
+
+    def assert_head
+      @head.nearest_fields.should == {
+        "name" => @name,
+        "location" => "Paris"
+      }
+    end
+
+    it "should work the same way as it does with fields specified" do
+      @head.save!
+      assert_head
+    end
+  end
+
+  describe "using a proc to define fields for a one-to-one polymorphic association from the has one side" do
+    before do
+      Person.send(:alize, :nearest_head, :fields => lambda { |inverse|
+        self.alize_fields(inverse) })
+      @person.nearest_head = @head
+    end
+
+    def assert_person
+      @person.nearest_head_fields.should == {
+        "size" => @size
+      }
+    end
+
+    it "should work the same way as it does with fields specified" do
+      @person.save!
+      assert_person
+    end
+  end
+
+  describe "using a proc to define fields for a has many polymorphic association from the :as side" do
+    before do
+      Head.send(:alize, :below, :fields => lambda { |inverse|
+        self.alize_fields(inverse) })
+      @head.below = [@person]
+    end
+
+    def assert_head
+      @head.below_fields.should == [{
+        "_id" => @person.id,
+        "name" => @name,
+        "location" => "Paris"
+      }]
+    end
+
+    it "should work the same way as it does with fields specified" do
+      @head.save!
+      assert_head
+    end
+  end
+
+  describe "using a proc to define fields for a has many polymorphic association from the belongs_to side" do
+    before do
+      Person.send(:alize, :above, :fields => lambda { |inverse|
+        self.alize_fields(inverse) })
+      @person.above = @head
+    end
+
+    def assert_person
+      @person.above_fields.should == {
+        "size" => @size,
+      }
+    end
+
+    it "should work the same way as it does with fields specified" do
+      @person.save!
+      assert_person
     end
   end
 end

@@ -36,14 +36,14 @@ describe Mongoid::Alize::Callback do
       callback.fields.should == [:name, :created_at]
     end
 
-    it "should add force_denormalization attribute to klass and inverse klass" do
-      callback = new_callback
-      Head.new.force_denormalization = true
-      Person.new.force_denormalization = true
+    it "should not set inverses for polymorphic associations" do
+      callback = klass.new(Head, :nearest, [:size])
+      callback.inverse_relation.should be_nil
+      callback.inverse_klass.should be_nil
     end
   end
 
-  describe "with callback " do
+  describe "with callback" do
     before do
       @callback = new_callback
     end
@@ -58,6 +58,54 @@ describe Mongoid::Alize::Callback do
         @callback.send(:attach)
         dont_allow(@callback.klass).alias_method
         @callback.send(:alias_callback)
+      end
+    end
+  end
+
+  describe "name helpers" do
+    before do
+      @callback = new_callback
+    end
+
+    it "should have a callback name" do
+      @callback.callback_name.should == "_denormalize_spec_person"
+    end
+
+    it "should have aliased callback name" do
+      @callback.aliased_callback_name.should == "denormalize_spec_person"
+    end
+
+    it "should add _fields to the callback name" do
+      @callback.fields_method_name.should == "_denormalize_spec_person_fields"
+    end
+  end
+
+  describe "define fields method" do
+    def define_fields_method
+      @callback.send(:define_fields_method)
+    end
+
+    describe "when fields is an array" do
+      before do
+        @callback = new_callback
+      end
+
+      it "should return the fields w/ to_s applied" do
+        define_fields_method
+        @head = Head.new
+        @head.send("_denormalize_spec_person_fields", nil).should == ["name", "created_at"]
+      end
+    end
+
+    describe "when fields is a proc" do
+      before do
+        @callback = klass.new(Head, :person, lambda { |inverse| [:name, :created_at] })
+      end
+
+      it "should return the fields w/ to_s applied" do
+        define_fields_method
+        @head = Head.new
+        @head.send("_denormalize_spec_person_fields", Person.new).should == ["name", "created_at"]
       end
     end
   end

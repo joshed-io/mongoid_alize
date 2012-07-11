@@ -24,29 +24,33 @@ describe Mongoid::Alize::Callbacks::To::ManyFromOne do
     { "_id" => "SomeObjectId" }
   end
 
-  before do
-    Head.class_eval do
-      field :sees_fields, :type => Array
-    end
-
+  def create_models
     @head = Head.create(
       :sees => [@person = Person.create(:name => "Bob",
-                                      :created_at => @now = Time.now)])
+                                        :created_at => @now = Time.now)])
     @person.seen_by = @head
-    @callback = new_callback
+  end
+
+  before do
+    Head.class_eval do
+      field :sees_fields, :type => Array, :default => []
+    end
   end
 
   describe "#define_callback" do
-    before do
-      @callback.send(:define_callback)
-    end
-
     def run_callback
       @person.send(:_denormalize_to_seen_by)
     end
 
+    before do
+      @callback = new_callback
+      @callback.send(:define_fields)
+      create_models
+      @callback.send(:define_callback)
+    end
+
     it "should push the fields to the relation" do
-      @head.sees_fields.should be_nil
+      @head.sees_fields.should == []
       run_callback
       @head.sees_fields.should == [sees_fields]
     end
@@ -71,12 +75,15 @@ describe Mongoid::Alize::Callbacks::To::ManyFromOne do
   end
 
   describe "#define_destroy_callback" do
-    before do
-      @callback.send(:define_destroy_callback)
-    end
-
     def run_destroy_callback
       @person.send(:_denormalize_destroy_to_seen_by)
+    end
+
+    before do
+      @callback = new_callback
+      @callback.send(:define_fields)
+      create_models
+      @callback.send(:define_destroy_callback)
     end
 
     it "should pull first any existing array entries matching the _id" do

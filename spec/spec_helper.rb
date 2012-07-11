@@ -27,6 +27,8 @@ RSpec.configure do |config|
     }
 
     [Head, Person].each do |klass|
+      klass.alize_callbacks = []
+      klass.alize_inverse_callbacks = []
       klass.reset_callbacks(:save)
       klass.reset_callbacks(:create)
       klass.reset_callbacks(:destroy)
@@ -35,7 +37,7 @@ RSpec.configure do |config|
           persistent_fields[Object]).include?(field.to_sym)
       end
       klass.instance_methods.each do |method|
-        if method =~ /^_?denormalize_/
+        if method =~ /^_?denormalize_/ && method !~ /_all$/
           klass.send(:undef_method, method)
         end
       end

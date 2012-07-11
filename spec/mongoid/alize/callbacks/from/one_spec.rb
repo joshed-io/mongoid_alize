@@ -14,39 +14,29 @@ describe Mongoid::Alize::Callbacks::From::One do
   end
 
   describe "#define_fields" do
-    it "should add properly typed, prefixed fields from the relation" do
-      callback = klass.new(Head, :person, [:name, :created_at])
-      callback.send(:define_fields)
-      Head.fields["person_name"].type.should == String
-      Head.fields["person_created_at"].type.should == Time
-    end
-
-    it "should define as a string field that's not defined" do
-      callback = klass.new(Head, :person, [:location])
-      callback.send(:define_fields)
-      Head.fields["person_location"].type.should == String
-    end
-
-    it "should not add the field if the field already exists" do
-      Head.class_eval do
-        field :person_name
+    describe "with an array of fields" do
+      it "should add a field generated from %{relation}_fields" do
+        callback = new_callback
+        callback.send(:define_fields)
+        Head.fields["person_fields"].type.should == Hash
       end
-      callback = klass.new(Head, :person, [:name])
-      dont_allow(Head).field
-      callback.send(:define_fields)
-    end
 
-    it "should not add the field if it already exists b/c of another relation" do
-      callback = klass.new(Head, :person, [:id])
-      dont_allow(Head).field
-      callback.send(:define_fields)
-    end
+      it "should default the field to empty" do
+        callback = new_callback
+        callback.send(:define_fields)
+        Head.new.person_fields.should == {}
+      end
 
-    it "should allow the id and type of the inverse to be denormalized without an extra _" do
-      callback = klass.new(Person, :head, [:id, :type])
-      callback.send(:define_fields)
-      Person.fields["head_id"].type.should == BSON::ObjectId
-      Person.fields["head_type"].type.should == String
+      it "should raise an already defined field error if the field already exists" do
+        Head.class_eval do
+          field :person_fields
+        end
+        callback = new_callback
+        expect {
+          callback.send(:define_fields)
+        }.to raise_error(Mongoid::Alize::Errors::AlreadyDefinedField,
+                         "person_fields is already defined on the Head model.")
+      end
     end
   end
 
@@ -55,37 +45,43 @@ describe Mongoid::Alize::Callbacks::From::One do
       @head.send(:_denormalize_from_person, force)
     end
 
-    before do
+    def person_fields
+      { "name"=> "Bob",
+        "location" => "Paris",
+        "created_at"=> @now.to_s(:utc) }
+    end
+
+    def create_models
       @head = Head.create
       @person = Person.create(:name => @name = "Bob",
                               :created_at => @now = Time.now)
+    end
 
+    before do
       @callback = new_callback
       @callback.send(:define_fields)
+      create_models
       @callback.send(:define_callback)
-
-      @head.relations["person"].should be_stores_foreign_key
     end
 
     it "should set fields from a changed relation" do
       @head.person = @person
       @head.should be_person_id_changed
       run_callback
-      @head.person_name.should == @name
-      @head.person_created_at.to_i.should == @now.to_i
-      @head.person_location.should == "Paris"
+      @head.person_fields.should == person_fields
     end
 
-    it "should assign nil values if the changed relation is nil" do
+    it "should set no fields from a nil relation" do
       @head.person = @person
       @head.save!
       @head.person = nil
       @head.should be_person_id_changed
       run_callback
-      @head.person_name.should be_nil
+      @head.person_fields.should == {}
     end
 
     it "should not run if the relation has not changed" do
+      @head.relations["person"].should be_stores_foreign_key
       @head.should_not be_person_id_changed
       dont_allow(@head).person
       run_callback
@@ -111,20 +107,22 @@ describe Mongoid::Alize::Callbacks::From::One do
     end
 
     before do
+      @callback = klass.new(Person, :head, [:size])
+      @callback.send(:define_fields)
+
       @person = Person.create
       @head = Head.create(:size => 5)
 
-      @callback = klass.new(Person, :head, [:size])
-      @callback.send(:define_fields)
       @callback.send(:define_callback)
-
       @person.relations["head"].should_not be_stores_foreign_key
     end
 
     it "should set values from a changed relation" do
       @person.head = @head
       run_callback
-      @person.head_size.should == 5
+      @person.head_fields.should == {
+        "size" => 5
+      }
     end
 
     it "should set values from a a nil relation" do
@@ -132,7 +130,7 @@ describe Mongoid::Alize::Callbacks::From::One do
       @person.save!
       @person.head = nil
       run_callback
-      @person.head_size.should be_nil
+      @person.head_fields.should == {}
     end
 
     it "should run even if the relation has not changed" do

@@ -3,6 +3,8 @@ module Mongoid
     class ToCallback < Callback
 
       def attach
+        define_fields
+
         define_callback
         alias_callback
         set_callback
@@ -12,7 +14,9 @@ module Mongoid
         set_destroy_callback
       end
 
-      protected
+      def define_fields
+        define_fields_method
+      end
 
       def set_callback
         unless callback_attached?("save", aliased_callback_name)
@@ -38,6 +42,10 @@ module Mongoid
 
       def destroy_callback_name
         "_#{aliased_destroy_callback_name}"
+      end
+
+      def prefixed_name
+        "#{inverse_relation}_fields"
       end
 
       def plain_relation

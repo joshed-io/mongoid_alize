@@ -17,8 +17,24 @@ class Person
   # the only head that is watching
   belongs_to :seen_by, :class_name => "Head", :inverse_of => :sees
 
+  # a polymorphic one-to-one relation
+  has_one :nearest_head, :class_name => "Head", :as => :nearest
+
+  # a polymorphic one-to-many relation
+  belongs_to :above, :polymorphic => true
+
   def location
     "Paris"
+  end
+
+  # example of one way to handling attribute selection
+  # for polymorphic associations or generally using the proc fields option
+  def alize_fields(inverse)
+    if inverse.is_a?(Head)
+      [:size]
+    else
+      [:id]
+    end
   end
 end
 

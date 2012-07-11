@@ -6,10 +6,10 @@ module Mongoid
       def define_callback
         klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
           def #{callback_name}#{force_param}
-            data = #{joined_field_values("self")}
+            field_values = #{field_values("self", :id => true)}
             (#{iterable_relation}).each do |inverse|
               #{pull_from_inverse}
-              inverse.push(:#{prefixed_name}, data)
+              inverse.push(:#{prefixed_name}, field_values)
             end
           end
           protected :#{callback_name}
@@ -40,10 +40,6 @@ module Mongoid
             end
           end
         CALLBACK
-      end
-
-      def prefixed_name
-        "#{inverse_relation}_fields"
       end
     end
   end

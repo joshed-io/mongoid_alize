@@ -7,19 +7,18 @@ module Mongoid
           protected
 
           def define_callback
-            field_sets = ""
-            fields.each do |name|
-              field_sets << "self.send(:#{prefixed_field_name(name)}=,
-                               relation && relation.send(:#{name}))\n"
-            end
-
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               def #{callback_name}#{force_param}
                 if #{force_check} ||
                     #{!reflect.stores_foreign_key?} ||
-                    self.#{reflect.key}_changed?
-                  relation = self.#{relation}
-                  #{field_sets}
+                      self.#{reflect.key}_changed?
+
+                  if relation = self.#{relation}
+                    self.#{self.prefixed_name} = #{field_values("relation")}
+                  else
+                    self.#{self.prefixed_name} = {}
+                  end
+
                 end
                 true
               end
@@ -29,28 +28,12 @@ module Mongoid
           end
 
           def define_fields
-            fields.each do |name|
-              prefixed_name = prefixed_field_name(name)
-              unless field_defined?(prefixed_name, klass)
-                klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-                  field :#{prefixed_name}, :type => #{inverse_field_type(name)}
-                CALLBACK
-              end
-            end
-          end
+            ensure_field_not_defined!(prefixed_name, klass)
+            klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
+              field :#{prefixed_name}, :type => Hash, :default => {}
+            CALLBACK
 
-          def prefixed_field_name(name)
-            "#{relation}_#{name}"
-          end
-
-          def inverse_field_type(name)
-            name = name.to_s
-
-            name = "_id" if name == "id"
-            name = "_type" if name == "type"
-
-            field = inverse_klass.fields[name]
-            (field && field.options[:type]) ? field.type : String
+            define_fields_method
           end
         end
       end

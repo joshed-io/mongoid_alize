@@ -17,18 +17,15 @@ module Mongoid
         self.fields = _fields
 
         self.reflect = _klass.relations[_relation.to_s]
-        self.inverse_klass = self.reflect.klass
         self.inverse_relation = self.reflect.inverse
-
-        self.klass.send(:attr_accessor, :force_denormalization)
-        self.inverse_klass.send(:attr_accessor, :force_denormalization)
+        unless self.reflect.polymorphic?
+          self.inverse_klass = self.reflect.klass
+        end
       end
 
       def attach
         # implement in subclasses
       end
-
-      protected
 
       def callback_attached?(callback_type, callback_name)
         !!klass.send(:"_#{callback_type}_callbacks").
@@ -53,13 +50,27 @@ module Mongoid
         "denormalize_#{direction}_#{relation}"
       end
 
-      def joined_fields
-        (fields + [:_id]).map {|f| "'#{f}'" }.join(", ")
+      def define_fields_method
+        _fields = fields
+        if fields.is_a?(Proc)
+          klass.send(:define_method, fields_method_name) do |inverse|
+            _fields.bind(self).call(inverse).map(&:to_s)
+          end
+        else
+          klass.send(:define_method, fields_method_name) do |inverse|
+            _fields.map(&:to_s)
+          end
+        end
       end
 
-      def joined_field_values(source)
+      def fields_method_name
+        "#{callback_name}_fields"
+      end
+
+      def field_values(source, options={})
+        extras = options[:id] ? "['_id']" : "[]"
         <<-RUBY
-          [#{joined_fields}].inject({}) { |hash, name|
+          (#{fields_method_name}(#{source}) + #{extras}).inject({}) { |hash, name|
             hash[name] = #{source}.send(name)
             hash
           }

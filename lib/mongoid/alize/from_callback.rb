@@ -10,8 +10,6 @@ module Mongoid
         set_callback
       end
 
-      protected
-
       def set_callback
         unless callback_attached?("save", aliased_callback_name)
           klass.set_callback(:save, :before, aliased_callback_name)
@@ -26,6 +24,10 @@ module Mongoid
 
       def field_defined?(prefixed_name, klass)
         !!klass.fields[prefixed_name]
+      end
+
+      def prefixed_name
+        "#{relation}_fields"
       end
 
       def direction

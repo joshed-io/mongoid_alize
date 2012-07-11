@@ -18,6 +18,7 @@ require 'mongoid/alize/callbacks/to/many_from_one.rb'
 require 'mongoid/alize/callbacks/to/many_from_many.rb'
 
 require 'mongoid/alize/macros'
+require 'mongoid/alize/instance_helpers'
 
 I18n.load_path << File.join(File.dirname(__FILE__), "..", "config", "locales", "en.yml")
 
@@ -27,6 +28,7 @@ module Mongoid
 
     included do
       extend Mongoid::Alize::Macros
+      include Mongoid::Alize::InstanceHelpers
     end
   end
 end
