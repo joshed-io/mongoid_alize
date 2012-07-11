@@ -84,6 +84,22 @@ module Mongoid
       def force_check
         "force || self.force_denormalization"
       end
+
+      def fields_to_s
+        if fields.is_a?(Proc)
+          "Proc Given"
+        else
+          fields.join(", ")
+        end
+      end
+
+      def to_s
+        "#{self.class.name}" +
+        "\nModel: #{self.klass}, Relation: #{self.relation}" + (self.metadata.polymorphic? ?
+        "\nPolymorphic" :
+        "\nInverse: #{self.inverse_klass}, Relation: #{self.inverse_relation}") +
+        "\nFields: #{fields_to_s}"
+      end
     end
   end
 end
