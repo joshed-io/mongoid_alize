@@ -6,7 +6,7 @@ module Mongoid
 
       attr_accessor :klass
       attr_accessor :relation
-      attr_accessor :reflect
+      attr_accessor :metadata
 
       attr_accessor :inverse_klass
       attr_accessor :inverse_relation
@@ -16,10 +16,10 @@ module Mongoid
         self.relation = _relation
         self.fields = _fields
 
-        self.reflect = _klass.relations[_relation.to_s]
-        self.inverse_relation = self.reflect.inverse
-        unless self.reflect.polymorphic?
-          self.inverse_klass = self.reflect.klass
+        self.metadata = _klass.relations[_relation.to_s]
+        self.inverse_relation = self.metadata.inverse
+        unless self.metadata.polymorphic?
+          self.inverse_klass = self.metadata.klass
         end
       end
 

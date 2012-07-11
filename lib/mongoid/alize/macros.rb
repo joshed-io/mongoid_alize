@@ -17,15 +17,15 @@ module Mongoid
         end
 
         klass = self
-        reflect = klass.relations[relation.to_s]
+        metadata = klass.relations[relation.to_s]
 
-        fields = default_alize_fields(reflect) if fields.empty?
+        fields = default_alize_fields(metadata) if fields.empty?
         fields = options[:fields] if options[:fields]
 
         from_one  = Mongoid::Alize::Callbacks::From::One
         from_many = Mongoid::Alize::Callbacks::From::Many
 
-        relation_superclass = reflect.relation.superclass
+        relation_superclass = metadata.relation.superclass
         callback_klass =
           case [relation_superclass]
           when [one]  then from_one
@@ -36,19 +36,19 @@ module Mongoid
           callback_klass.new(klass, relation, fields)
         callback.attach
 
-        unless reflect.polymorphic?
-          inverse_klass = reflect.klass
-          inverse_relation = reflect.inverse
+        unless metadata.polymorphic?
+          inverse_klass = metadata.klass
+          inverse_relation = metadata.inverse
 
           if inverse_klass &&
-              (inverse_reflect = inverse_klass.relations[inverse_relation.to_s])
+              (inverse_metadata = inverse_klass.relations[inverse_relation.to_s])
 
             to_one_from_one   = Mongoid::Alize::Callbacks::To::OneFromOne
             to_one_from_many  = Mongoid::Alize::Callbacks::To::OneFromMany
             to_many_from_one  = Mongoid::Alize::Callbacks::To::ManyFromOne
             to_many_from_many = Mongoid::Alize::Callbacks::To::ManyFromMany
 
-            inverse_relation_superclass = inverse_reflect.relation.superclass
+            inverse_relation_superclass = inverse_metadata.relation.superclass
             inverse_callback_klass =
               case [relation_superclass, inverse_relation_superclass]
               when [one,  one]  then to_one_from_one
@@ -64,11 +64,11 @@ module Mongoid
         end
       end
 
-      def default_alize_fields(reflect)
-        if reflect.polymorphic?
+      def default_alize_fields(metadata)
+        if metadata.polymorphic?
           []
         else
-          reflect.klass.
+          metadata.klass.
             fields.reject { |name, field|
             name =~ /^_/
           }.keys

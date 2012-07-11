@@ -10,8 +10,8 @@ module Mongoid
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               def #{callback_name}#{force_param}
                 if #{force_check} ||
-                    #{!reflect.stores_foreign_key?} ||
-                      self.#{reflect.key}_changed?
+                    #{!metadata.stores_foreign_key?} ||
+                      self.#{metadata.key}_changed?
 
                   if relation = self.#{relation}
                     self.#{self.prefixed_name} = #{field_values("relation")}
