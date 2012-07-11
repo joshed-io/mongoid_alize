@@ -45,6 +45,12 @@ describe Mongoid::Alize::Macros do
         dont_allow(Mongoid::Alize::Callbacks::To::OneFromOne).new
         Head.alize(:nearest)
       end
+
+      it "should not attach a callback to the inverse on the as side either" do
+        Head.relations["below"].should be_polymorphic
+        dont_allow(Mongoid::Alize::Callbacks::To::OneFromOne).new
+        Head.alize(:below)
+      end
     end
 
     describe "fields" do
