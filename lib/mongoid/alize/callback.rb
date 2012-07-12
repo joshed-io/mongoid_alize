@@ -10,6 +10,7 @@ module Mongoid
 
       attr_accessor :inverse_klass
       attr_accessor :inverse_relation
+      attr_accessor :inverse_metadata
 
       def initialize(_klass, _relation, _fields)
         self.klass = _klass
@@ -17,9 +18,11 @@ module Mongoid
         self.fields = _fields
 
         self.metadata = _klass.relations[_relation.to_s]
-        self.inverse_relation = self.metadata.inverse
-        unless self.metadata.polymorphic?
+        if !(self.metadata.polymorphic? &&
+              self.metadata.stores_foreign_key?)
           self.inverse_klass = self.metadata.klass
+          self.inverse_relation = self.metadata.inverse
+          self.inverse_metadata = self.inverse_klass.relations[inverse_relation.to_s]
         end
       end
 
@@ -39,6 +42,7 @@ module Mongoid
       def alias_callback
         unless callback_defined?(aliased_callback_name)
           klass.send(:alias_method, aliased_callback_name, callback_name)
+          klass.send(:public, aliased_callback_name)
         end
       end
 

@@ -366,13 +366,13 @@ describe Mongoid::Alize do
 
   describe "using a proc to define fields for a has many polymorphic association from the :as side" do
     before do
-      Head.send(:alize, :below, :fields => lambda { |inverse|
+      Head.send(:alize, :below_people, :fields => lambda { |inverse|
         self.alize_fields(inverse) })
-      @head.below = [@person]
+      @head.below_people = [@person]
     end
 
     def assert_head
-      @head.below_fields.should == [{
+      @head.below_people_fields.should == [{
         "_id" => @person.id,
         "name" => @name,
         "location" => "Paris"
@@ -401,6 +401,95 @@ describe Mongoid::Alize do
     it "should work the same way as it does with fields specified" do
       @person.save!
       assert_person
+    end
+  end
+
+  describe "the push on the child side of a one-to-one polymorphic" do
+    before do
+      fields = { :fields => lambda { |person| [:name, :location] } }
+      Head.send(:alize, :nearest, fields)
+      Person.send(:alize_to, :nearest_head, fields)
+      @head.nearest = @person
+    end
+
+    def assert_head
+      @head.nearest_fields.should == {
+        "name" => @name,
+        "location" => "Paris"
+      }
+    end
+
+    it "should push the new fields" do
+      @head.save!
+      assert_head
+      @person.update_attributes!(:name => @name = "George")
+      assert_head
+    end
+  end
+
+  describe "the push on the child side of a one-to-many polymorphic" do
+    before do
+      fields = { :fields => lambda { |head| [:size] } }
+      Person.send(:alize, :above, fields)
+      Head.send(:alize_to, :below_people, fields)
+      @person.above = @head
+    end
+
+    def assert_person
+      @person.above_fields.should == {
+        "size" => @size
+      }
+    end
+
+    it "should push the new fields" do
+      @person.save!
+      assert_person
+      @head.update_attributes!(:size => @size = 5)
+      assert_person
+    end
+  end
+
+  describe "the push on the parent side of a one-to-one polymorphic" do
+    before do
+      fields = { :fields => lambda { |inverse| [:size] } }
+      Person.send(:alize, :nearest_head, fields)
+      @person.nearest_head = @head
+      @person.save!
+    end
+
+    def assert_person
+      @person.nearest_head_fields.should == {
+        "size" => @size
+      }
+    end
+
+    it "should push the new fields" do
+      assert_person
+      @head.update_attributes!(:size => @size = 5)
+      assert_person
+    end
+  end
+
+  describe "the push on the parent side of a one-to-many polymorphic" do
+    before do
+      fields = { :fields => lambda { |inverse| [:name, :location] } }
+      Head.send(:alize, :below_people, fields)
+      @head.below_people = [@person]
+      @head.save!
+    end
+
+    def assert_head
+      @head.below_people_fields.should == [{
+        "_id" => @person.id,
+        "name" => @name,
+        "location" => "Paris"
+      }]
+    end
+
+    it "should push the new fields" do
+      assert_head
+      @person.update_attributes!(:name => @name = "George")
+      assert_head
     end
   end
 end

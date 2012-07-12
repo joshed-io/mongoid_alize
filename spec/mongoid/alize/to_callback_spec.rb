@@ -42,8 +42,17 @@ describe Mongoid::Alize::ToCallback do
       @callback.aliased_destroy_callback_name.should == "denormalize_destroy_to_head"
     end
 
-    it "should assign a prefixed name from the inverse" do
-      @callback.prefixed_name.should == "person_fields"
+    it "should assign a prefixed name from the inverse if present" do
+      @callback.inverse_klass.should == Head
+      @callback.inverse_relation.should == :person
+      @callback.prefixed_name.should == ":person_fields"
+    end
+
+    it "should compute the name on the fly if the inverse is not present" do
+      @callback = klass.new(Head, :nearest, [:name])
+      @callback.inverse_klass.should be_nil
+      @callback.inverse_relation.should be_nil
+      @callback.prefixed_name.should =~ /relation/
     end
   end
 

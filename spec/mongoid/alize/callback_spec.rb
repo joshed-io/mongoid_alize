@@ -33,13 +33,20 @@ describe Mongoid::Alize::Callback do
       callback.relation.should == :person
       callback.inverse_klass = Person
       callback.inverse_relation = :head
+      callback.inverse_metadata.should == Person.relations["head"]
       callback.fields.should == [:name, :created_at]
     end
 
-    it "should not set inverses for polymorphic associations" do
+    it "should not set inverses for the child in a polymorphic association" do
       callback = klass.new(Head, :nearest, [:size])
-      callback.inverse_relation.should be_nil
       callback.inverse_klass.should be_nil
+      callback.inverse_relation.should be_nil
+    end
+
+    it "should set inverses for the parent in a polymorphic association" do
+      callback = klass.new(Person, :nearest_head, [:size])
+      callback.inverse_klass.should == Head
+      callback.inverse_relation.should == :nearest
     end
   end
 
@@ -49,8 +56,9 @@ describe Mongoid::Alize::Callback do
     end
 
     describe "#alias_callback" do
-      it "should alias the callback on the klass" do
+      it "should alias the callback on the klass and make it public" do
         mock(@callback.klass).alias_method("denormalize_spec_person", "_denormalize_spec_person")
+        mock(@callback.klass).public("denormalize_spec_person")
         @callback.send(:alias_callback)
       end
 

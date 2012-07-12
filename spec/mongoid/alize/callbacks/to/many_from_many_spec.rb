@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Mongoid::Alize::Callbacks::To::ManyFromMany do
+describe Mongoid::Alize::ToCallback do
   def klass
-    Mongoid::Alize::Callbacks::To::ManyFromMany
+    Mongoid::Alize::ToCallback
   end
 
   def args

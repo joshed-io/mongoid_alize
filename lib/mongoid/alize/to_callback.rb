@@ -14,6 +14,99 @@ module Mongoid
         set_destroy_callback
       end
 
+      def define_callback
+        klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
+
+          def #{callback_name}#{force_param}
+
+            #{iterable_relation}.each do |relation|
+
+              is_one = #{is_one?}
+              if is_one
+                field_values = #{field_values("self")}
+              else
+                field_values = #{field_values("self", :id => true)}
+              end
+
+              prefixed_name = #{prefixed_name}
+              if is_one
+                relation.set(prefixed_name, field_values)
+              else
+                #{pull_from_inverse}
+                relation.push(prefixed_name, field_values)
+              end
+            end
+
+            true
+          end
+          protected :#{callback_name}
+        CALLBACK
+      end
+
+      def define_destroy_callback
+        klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
+
+          def #{destroy_callback_name}
+            #{iterable_relation}.each do |relation|
+              is_one = #{is_one?}
+              prefixed_name = #{prefixed_name}
+              if is_one
+                relation.set(prefixed_name, {})
+              else
+                #{pull_from_inverse}
+              end
+            end
+
+            true
+          end
+          protected :#{destroy_callback_name}
+        CALLBACK
+      end
+
+      def pull_from_inverse
+        <<-RUBIES
+          relation.pull(prefixed_name, { "_id" => self.id })
+          if _f = relation.send(prefixed_name)
+            _f.reject! do |hash|
+              hash["_id"] == self.id
+            end
+          end
+        RUBIES
+      end
+
+      def prefixed_name
+        if inverse_relation
+          ":#{inverse_relation}_fields"
+        else
+          <<-RUBIES
+            (#{find_relation}[0].to_s + '_fields')
+          RUBIES
+        end
+      end
+
+      def is_one?
+        if inverse_relation
+          if self.inverse_metadata.relation.superclass == Mongoid::Relations::One
+            "true"
+          else
+            "false"
+          end
+        else
+          <<-RUBIES
+            (#{find_relation}[1].relation.superclass == Mongoid::Relations::One)
+          RUBIES
+        end
+      end
+
+      def find_relation
+        # "relation.class.relations.find { |name, metadata| metadata.name == :#{relation} || metadata.inverse == :#{relation} }"
+        "relation.class.relations.find { |name, metadata| metadata.inverse == :#{relation} }"
+      end
+
+      def iterable_relation
+        "[self.#{relation}].flatten.compact"
+      end
+
       def define_fields
         define_fields_method
       end
@@ -42,18 +135,6 @@ module Mongoid
 
       def destroy_callback_name
         "_#{aliased_destroy_callback_name}"
-      end
-
-      def prefixed_name
-        "#{inverse_relation}_fields"
-      end
-
-      def plain_relation
-        "self.#{relation}"
-      end
-
-      def surrounded_relation
-        "self.#{relation} ? [self.#{relation}] : []"
       end
 
       def direction

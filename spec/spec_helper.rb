@@ -27,8 +27,8 @@ RSpec.configure do |config|
     }
 
     [Head, Person].each do |klass|
-      klass.alize_callbacks = []
-      klass.alize_inverse_callbacks = []
+      klass.alize_from_callbacks = []
+      klass.alize_to_callbacks = []
       klass.reset_callbacks(:save)
       klass.reset_callbacks(:create)
       klass.reset_callbacks(:destroy)

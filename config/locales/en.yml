@@ -7,4 +7,5 @@ en:
             "%{name} does not exist on the %{inverse_klass} model."
           already_defined_field:
             "%{name} is already defined on the %{klass} model."
+          invalid_configuration:
 

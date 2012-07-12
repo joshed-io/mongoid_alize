@@ -8,7 +8,7 @@ class Head
   # to whom it's attached
   belongs_to :person
 
-  # in who's possession it is
+  # in whose possession it is
   belongs_to :captor, :class_name => "Person", :inverse_of => :heads
 
   # who'd otherwise like to possess it
@@ -24,7 +24,7 @@ class Head
   belongs_to :nearest, :polymorphic => true
 
   # a polymorphic one-to-many relation
-  has_many :below, :class_name => "Person", :as => :above
+  has_many :below_people, :class_name => "Person", :as => :above
 
   def density
     "low"

@@ -9,7 +9,7 @@ module MacrosHelper
     end
 
     def tns
-      Mongoid::Alize::Callbacks::To
+      Mongoid::Alize::ToCallback
     end
 
     def it_should_set_callbacks(klass, inverse_klass, relation, inverse_relation, fns, tns)
@@ -25,9 +25,9 @@ module MacrosHelper
 
         mock(fns).new(klass, relation, fields) { obj_mock }
         mock(obj_mock).attach
-        klass.send(:alize, relation, *fields)
+        klass.send(:alize_from, relation, *fields)
 
-        klass.alize_callbacks.should == [obj_mock]
+        klass.alize_from_callbacks.should == [obj_mock]
       end
 
       it "should use #{tns} to push" do
@@ -40,9 +40,9 @@ module MacrosHelper
 
         mock(tns).new(inverse_klass, inverse_relation, fields) { obj_mock }
         mock(obj_mock).attach
-        klass.send(:alize, relation, *fields)
+        inverse_klass.send(:alize_to, inverse_relation, *fields)
 
-        inverse_klass.alize_inverse_callbacks.should == [obj_mock]
+        inverse_klass.alize_to_callbacks.should == [obj_mock]
       end
     end
   end

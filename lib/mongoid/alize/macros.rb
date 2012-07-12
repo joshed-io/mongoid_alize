@@ -2,12 +2,80 @@ module Mongoid
   module Alize
     module Macros
 
-      attr_accessor :alize_callbacks, :alize_inverse_callbacks
+      attr_accessor :alize_from_callbacks, :alize_to_callbacks
 
       def alize(relation, *fields)
+        alize_from(relation, *fields)
+        metadata = self.relations[relation.to_s]
+        unless (metadata.polymorphic? &&
+                metadata.stores_foreign_key?) || metadata.inverse.nil?
+          metadata.klass.alize_to(metadata.inverse, *fields)
+        end
+      end
 
+      def alize_from(relation, *fields)
+        one, many = _alize_relation_types
+
+        from_one  = Mongoid::Alize::Callbacks::From::One
+        from_many = Mongoid::Alize::Callbacks::From::Many
+
+        klass = self
+        metadata = klass.relations[relation.to_s]
+        relation_superclass = metadata.relation.superclass
+
+        callback_klass =
+          case [relation_superclass]
+          when [one]  then from_one
+          when [many] then from_many
+          end
+
+        fields = _alize_extract_fields(fields, metadata)
+
+        (klass.alize_from_callbacks ||= []) << callback =
+          callback_klass.new(klass, relation, fields)
+        callback.attach
+
+      end
+
+      def alize_to(relation, *fields)
+        one, many = _alize_relation_types
+
+        klass = self
+        metadata = klass.relations[relation.to_s]
+        relation_superclass = metadata.relation.superclass
+
+        fields = _alize_extract_fields(fields, metadata)
+
+        (klass.alize_to_callbacks ||= []) << callback =
+          Mongoid::Alize::ToCallback.new(klass, relation, fields)
+        callback.attach
+
+      end
+
+      def default_alize_fields(metadata)
+        if (metadata.polymorphic? && metadata.stores_foreign_key?) || metadata.klass.nil?
+          []
+        else
+          metadata.klass.
+            fields.reject { |name, field|
+            name =~ /^_/
+          }.keys
+        end
+      end
+
+      private
+
+      def _alize_extract_fields(fields, metadata)
         options = fields.extract_options!
+        if options[:fields]
+          fields = options[:fields]
+        elsif fields.empty?
+          fields = default_alize_fields(metadata)
+        end
+        fields
+      end
 
+      def _alize_relation_types
         one  = Mongoid::Relations::One
         many = Mongoid::Relations::Many
 
@@ -16,63 +84,7 @@ module Mongoid
            Mongoid::Relations::Referenced::Many].map(&:name).include?(klass.name)
         end
 
-        klass = self
-        metadata = klass.relations[relation.to_s]
-
-        fields = default_alize_fields(metadata) if fields.empty?
-        fields = options[:fields] if options[:fields]
-
-        from_one  = Mongoid::Alize::Callbacks::From::One
-        from_many = Mongoid::Alize::Callbacks::From::Many
-
-        relation_superclass = metadata.relation.superclass
-        callback_klass =
-          case [relation_superclass]
-          when [one]  then from_one
-          when [many] then from_many
-          end
-
-        (klass.alize_callbacks ||= []) << callback =
-          callback_klass.new(klass, relation, fields)
-        callback.attach
-
-        unless metadata.polymorphic?
-          inverse_klass = metadata.klass
-          inverse_relation = metadata.inverse
-
-          if inverse_klass &&
-              (inverse_metadata = inverse_klass.relations[inverse_relation.to_s])
-
-            to_one_from_one   = Mongoid::Alize::Callbacks::To::OneFromOne
-            to_one_from_many  = Mongoid::Alize::Callbacks::To::OneFromMany
-            to_many_from_one  = Mongoid::Alize::Callbacks::To::ManyFromOne
-            to_many_from_many = Mongoid::Alize::Callbacks::To::ManyFromMany
-
-            inverse_relation_superclass = inverse_metadata.relation.superclass
-            inverse_callback_klass =
-              case [relation_superclass, inverse_relation_superclass]
-              when [one,  one]  then to_one_from_one
-              when [many, one]  then to_many_from_one
-              when [one,  many] then to_one_from_many
-              when [many, many] then to_many_from_many
-              end
-
-            (inverse_klass.alize_inverse_callbacks ||= []) << inverse_callback =
-              inverse_callback_klass.new(inverse_klass, inverse_relation, fields)
-            inverse_callback.attach
-          end
-        end
-      end
-
-      def default_alize_fields(metadata)
-        if metadata.polymorphic?
-          []
-        else
-          metadata.klass.
-            fields.reject { |name, field|
-            name =~ /^_/
-          }.keys
-        end
+        [one, many]
       end
     end
   end

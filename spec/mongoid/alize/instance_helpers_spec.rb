@@ -7,7 +7,7 @@ describe Mongoid::Alize::InstanceHelpers do
   end
 
   def to_klass
-    Mongoid::Alize::Callbacks::To::OneFromOne
+    Mongoid::Alize::ToCallback
   end
 
   before do
@@ -18,7 +18,7 @@ describe Mongoid::Alize::InstanceHelpers do
 
   describe "#denormalize_from_all" do
     it "should run the alize callbacks" do
-      Head.alize_callbacks <<
+      Head.alize_from_callbacks <<
           callback = from_klass.new(Head, :person, [:name])
       mock(@head).denormalize_from_person
       @head.denormalize_from_all
@@ -27,7 +27,7 @@ describe Mongoid::Alize::InstanceHelpers do
 
   describe "#denormalize_to_all" do
     it "should run the alize callbacks" do
-      Person.alize_inverse_callbacks <<
+      Person.alize_to_callbacks <<
           callback = to_klass.new(Person, :head, [:size])
       mock(@person).denormalize_to_head
       @person.denormalize_to_all

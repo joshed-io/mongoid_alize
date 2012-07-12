@@ -5,11 +5,11 @@ module Mongoid
       attr_accessor :force_denormalization
 
       def denormalize_from_all
-        run_alize_callbacks(self.class.alize_callbacks)
+        run_alize_callbacks(self.class.alize_from_callbacks)
       end
 
       def denormalize_to_all
-        run_alize_callbacks(self.class.alize_inverse_callbacks)
+        run_alize_callbacks(self.class.alize_to_callbacks)
       end
 
       private
