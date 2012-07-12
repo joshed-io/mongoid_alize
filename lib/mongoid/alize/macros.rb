@@ -28,7 +28,12 @@ module Mongoid
           when [many] then from_many
           end
 
-        fields = _alize_process_fields(fields, metadata)
+        options = fields.extract_options!
+        if options[:fields]
+          fields = options[:fields]
+        elsif fields.empty? && !_alize_unknown_inverse?(metadata)
+          fields = metadata.klass.default_alize_fields
+        end
 
         (klass.alize_from_callbacks ||= []) << callback =
           callback_klass.new(klass, relation, fields)
@@ -43,7 +48,12 @@ module Mongoid
         metadata = klass.relations[relation.to_s]
         relation_superclass = metadata.relation.superclass
 
-        fields = _alize_process_fields(fields, metadata)
+        options = fields.extract_options!
+        if options[:fields]
+          fields = options[:fields]
+        elsif fields.empty?
+          fields = klass.default_alize_fields
+        end
 
         (klass.alize_to_callbacks ||= []) << callback =
           Mongoid::Alize::ToCallback.new(klass, relation, fields)
@@ -58,16 +68,6 @@ module Mongoid
       end
 
       private
-
-      def _alize_process_fields(fields, metadata)
-        options = fields.extract_options!
-        if options[:fields]
-          fields = options[:fields]
-        elsif fields.empty? && !_alize_unknown_inverse?(metadata)
-          fields = metadata.klass.default_alize_fields
-        end
-        fields
-      end
 
       def _alize_unknown_inverse?(metadata)
         (metadata.polymorphic? && metadata.stores_foreign_key?) ||

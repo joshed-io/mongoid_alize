@@ -56,7 +56,7 @@ describe Mongoid::Alize::Macros do
           Person.relations["nearest_head"].should be_polymorphic
           Person.relations["nearest_head"].should_not be_stores_foreign_key
           Person.relations["nearest_head"].klass.should == Head
-          mock.proxy(Mongoid::Alize::ToCallback).new(Head, :nearest, [])
+          mock.proxy(Mongoid::Alize::ToCallback).new(Head, :nearest, head_default_fields)
           Person.alize(:nearest_head)
         end
 
@@ -87,7 +87,7 @@ describe Mongoid::Alize::Macros do
 
       describe "with no fields supplied" do
         it "should use the default alize fields" do
-          mock.proxy(Mongoid::Alize::ToCallback).new(Person, :head, head_default_fields)
+          mock.proxy(Mongoid::Alize::ToCallback).new(Person, :head, person_default_fields)
           Person.alize_to(:head)
         end
       end

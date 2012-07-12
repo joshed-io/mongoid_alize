@@ -217,19 +217,45 @@ describe Mongoid::Alize do
   end
 
   describe "without specifying fields" do
-    before do
-      @head.person = @person
+    describe "for non-polymorphic" do
+      before do
+        @head.person = @person
+      end
+
+      it "should denormalize all non-internal fields" do
+        Head.send(:alize, :person)
+        @head.save!
+        @head.person_fields.should == {
+          "name" => @name,
+          "created_at" => @person.created_at,
+          "seen_by_id" => nil,
+          "want_ids" => []
+        }
+      end
+
+      it "should denormalize all non-internal fields" do
+        Head.send(:alize, :person)
+        @person.save!
+        @head.person_fields.should == {
+          "name" => @name,
+          "created_at" => @person.created_at,
+          "seen_by_id" => nil,
+          "want_ids" => []
+        }
+      end
     end
 
-    it "should denormalize all non-internal fields" do
-      Head.send(:alize, :person)
-      @head.save!
-      @head.person_fields.should == {
-        "name" => @name,
-        "created_at" => @person.created_at,
-        "seen_by_id" => nil,
-        "want_ids" => []
-      }
+    describe "for polymorphic" do
+      before do
+        @head.person = @person
+      end
+
+      it "should denormalize no default fields for a polymorphic child side" do
+        @head.nearest = @person
+        Head.send(:alize_from, :nearest)
+        @head.save!
+        @head.nearest_fields.should == {}
+      end
     end
   end
 
