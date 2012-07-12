@@ -7,8 +7,7 @@ module Mongoid
       def alize(relation, *fields)
         alize_from(relation, *fields)
         metadata = self.relations[relation.to_s]
-        unless (metadata.polymorphic? &&
-                metadata.stores_foreign_key?) || metadata.inverse.nil?
+        unless _alize_unknown_inverse?(metadata)
           metadata.klass.alize_to(metadata.inverse, *fields)
         end
       end
@@ -29,7 +28,7 @@ module Mongoid
           when [many] then from_many
           end
 
-        fields = _alize_extract_fields(fields, metadata)
+        fields = _alize_process_fields(fields, metadata)
 
         (klass.alize_from_callbacks ||= []) << callback =
           callback_klass.new(klass, relation, fields)
@@ -44,7 +43,7 @@ module Mongoid
         metadata = klass.relations[relation.to_s]
         relation_superclass = metadata.relation.superclass
 
-        fields = _alize_extract_fields(fields, metadata)
+        fields = _alize_process_fields(fields, metadata)
 
         (klass.alize_to_callbacks ||= []) << callback =
           Mongoid::Alize::ToCallback.new(klass, relation, fields)
@@ -52,27 +51,28 @@ module Mongoid
 
       end
 
-      def default_alize_fields(metadata)
-        if (metadata.polymorphic? && metadata.stores_foreign_key?) || metadata.klass.nil?
-          []
-        else
-          metadata.klass.
-            fields.reject { |name, field|
-            name =~ /^_/
-          }.keys
-        end
+      def default_alize_fields
+        self.fields.reject { |name, field|
+          name =~ /^_/
+        }.keys
       end
 
       private
 
-      def _alize_extract_fields(fields, metadata)
+      def _alize_process_fields(fields, metadata)
         options = fields.extract_options!
         if options[:fields]
           fields = options[:fields]
-        elsif fields.empty?
-          fields = default_alize_fields(metadata)
+        elsif fields.empty? && !_alize_unknown_inverse?(metadata)
+          fields = metadata.klass.default_alize_fields
         end
         fields
+      end
+
+      def _alize_unknown_inverse?(metadata)
+        (metadata.polymorphic? && metadata.stores_foreign_key?) ||
+          metadata.klass.nil? ||
+          metadata.inverse.nil?
       end
 
       def _alize_relation_types

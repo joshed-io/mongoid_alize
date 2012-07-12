@@ -218,11 +218,11 @@ describe Mongoid::Alize do
 
   describe "without specifying fields" do
     before do
-      Head.send(:alize, :person)
       @head.person = @person
     end
 
     it "should denormalize all non-internal fields" do
+      Head.send(:alize, :person)
       @head.save!
       @head.person_fields.should == {
         "name" => @name,
