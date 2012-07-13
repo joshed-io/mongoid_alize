@@ -102,8 +102,7 @@ module Mongoid
       end
 
       def find_relation
-        # "relation.class.relations.find { |name, metadata| metadata.name == :#{relation} || metadata.inverse == :#{relation} }"
-        "relation.class.relations.find { |name, metadata| metadata.inverse == :#{relation} }"
+        "relation.class.relations.find { |name, metadata| metadata.inverse == :#{relation} && metadata.class_name == self.class.name }"
       end
 
       def iterable_relation
