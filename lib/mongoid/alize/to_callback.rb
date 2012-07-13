@@ -20,6 +20,7 @@ module Mongoid
           def #{callback_name}#{force_param}
 
             #{iterable_relation}.each do |relation|
+              next if relation.attributes.frozen?
 
               is_one = #{is_one?}
               if is_one
@@ -48,10 +49,12 @@ module Mongoid
 
           def #{destroy_callback_name}
             #{iterable_relation}.each do |relation|
+              next if relation.attributes.frozen?
+
               is_one = #{is_one?}
               prefixed_name = #{prefixed_name}
               if is_one
-                relation.set(prefixed_name, {})
+                  relation.set(prefixed_name, {})
               else
                 #{pull_from_inverse}
               end

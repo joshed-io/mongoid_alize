@@ -1,32 +1,23 @@
 require 'spec_helper'
 
-class Mongoid::Alize::SpecToCallback < Mongoid::Alize::ToCallback
-  def define_callback
-    klass.class_eval <<-CALLBACK
-      def _denormalize_to_head
-      end
-    CALLBACK
-  end
-
-  def define_destroy_callback
-    klass.class_eval <<-CALLBACK
-      def _denormalize_destroy_to_head
-      end
-    CALLBACK
-  end
-end
-
 describe Mongoid::Alize::ToCallback do
   def klass
-    Mongoid::Alize::SpecToCallback
+    Mongoid::Alize::ToCallback
   end
 
   def args
-    [Person, :head, [:name, :location, :created_at]]
+    [Person, :head, [:name]]
   end
 
   def new_callback
     klass.new(*args)
+  end
+
+  def define_and_create(callback_name=:define_callback)
+    @callback = new_callback
+    @callback.send(:define_fields)
+    create_models
+    @callback.send(callback_name)
   end
 
   before do
@@ -99,6 +90,53 @@ describe Mongoid::Alize::ToCallback do
       @callback.send(:attach)
       dont_allow(@callback.klass).alias_method
       @callback.send(:alias_destroy_callback)
+    end
+  end
+
+  describe "not modifying frozen hashes" do
+    def create_models
+      @person = Person.create!(:name => @name = "George")
+      @head = Head.create(:person => @person)
+    end
+
+    def person_fields
+      { :name => @name }
+    end
+
+    before do
+      Head.class_eval do
+        field :person_fields, :type => Hash, :default => {}
+      end
+      define_and_create(:define_destroy_callback)
+    end
+
+    describe "#define_callback" do
+      def run_callback
+        @person.send(:_denormalize_to_head)
+      end
+
+      before do
+        define_and_create(:define_callback)
+      end
+
+      it "should not modify object frozen for deletion" do
+        @head.destroy
+        run_callback
+        @head.person_fields.should == {}
+      end
+    end
+
+    describe "#define_destroy_callback" do
+      def run_callback
+        @person.send(:_denormalize_destroy_to_head)
+      end
+
+      it "should not modify object frozen for deletion" do
+        @head.person_fields = person_fields
+        @head.destroy
+        run_callback
+        @head.person_fields.should == person_fields
+      end
     end
   end
 end
