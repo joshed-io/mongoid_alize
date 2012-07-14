@@ -83,6 +83,7 @@ describe Mongoid::Alize::ToCallback do
   describe "#alias_destroy_callback" do
     it "should alias the destroy callback on the klass" do
       mock(@callback.klass).alias_method("denormalize_destroy_to_head", "_denormalize_destroy_to_head")
+      mock(@callback.klass).public("denormalize_destroy_to_head")
       @callback.send(:alias_destroy_callback)
     end
 

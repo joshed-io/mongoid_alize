@@ -128,6 +128,7 @@ module Mongoid
       def alias_destroy_callback
         unless callback_defined?(aliased_destroy_callback_name)
           klass.send(:alias_method, aliased_destroy_callback_name, destroy_callback_name)
+          klass.send(:public, aliased_destroy_callback_name)
         end
       end
 
