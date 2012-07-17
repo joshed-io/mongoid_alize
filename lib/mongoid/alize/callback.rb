@@ -12,7 +12,11 @@ module Mongoid
       attr_accessor :inverse_relation
       attr_accessor :inverse_metadata
 
+      attr_accessor :debug
+
       def initialize(_klass, _relation, _fields)
+        self.debug = ENV["ALIZE_DEBUG"]
+
         self.klass = _klass
         self.relation = _relation
         self.fields = _fields

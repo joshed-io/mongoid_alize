@@ -36,8 +36,10 @@ module Mongoid
                 #{pull_from_inverse}
                 relation.push(prefixed_name, field_values)
               end
+
             end
 
+            #{debug ? "puts \"#{callback_name}\"": ""}
             true
           end
           protected :#{callback_name}
@@ -60,6 +62,7 @@ module Mongoid
               end
             end
 
+            #{debug ? "puts \"#{destroy_callback_name}\"": ""}
             true
           end
           protected :#{destroy_callback_name}
