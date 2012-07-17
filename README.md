@@ -5,8 +5,6 @@ Mongoid::Alize
 Mongoid Alizé helps you improve your Mongoid application's
 read performance by making it easy to store related data together.
 
-#### Announcement! Release 0.2.0 has drrrrropped. See below for changelog. Thanks to issue submitters!
-
 Features of Mongoid Alizé
 -------------------------
 - Extremely light DSL and easy setup
