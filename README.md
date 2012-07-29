@@ -1,18 +1,24 @@
 Mongoid::Alize
 ==============
-> Comprehensive, flexible denormalization for Mongoid that stays in sync
+**Comprehensive, flexible denormalization for Mongoid that stays in sync**
+
+> Everything *and* the kitchen sync...
 
 Mongoid Alizé helps you improve your Mongoid application's
 read performance by making it easy to store related data together.
 
+### 0.3.0 introduces breaking API changes, read the changelog below.
+
 Features of Mongoid Alizé
 -------------------------
 - Extremely light DSL and easy setup
-- Works from both sides of one-to-one, one-to-many, and many-to-many relations.
+- Works with one-to-one, one-to-many, and many-to-many relations.
 - Callbacks set on both sides of relations keep data in sync. Even on destroys!
-- Atomic modifiers and grouped updates used whenever possible for better performance
-- Specify lists of fields and methods to denormalize, or default to all fields
-- Override individual denormalization callbacks to implement custom behavior like denormalizing asynchronously
+- Atomic modifiers are used for superior performance.
+- Supports polymorphic relations as of 0.3.0.
+- Custom callbacks and exposed metadata provide flexibility and extensibility (e.g. asynchronous denormalization)
+- Comprehensive test suite with dozens of examples
+- The [wiki](https://github.com/dzello/mongoid_alize/wiki), soon to be full of war stories and protips.
 
 Installation
 ------------
@@ -45,10 +51,10 @@ Here's a simple use case. A `Post` model would like to denormalize some data abo
 
     # User data now saves into the Post record
     @post.user = User.create!(:name => "Josh", :city => "San Francisco")
-    @post.user_name #=> "Josh"
-    @post.user_city #=> "San Francisco"
+    @post.user_fields["name"] #=> "Josh"
+    @post.user_fields["city"] #=> "San Francisco"
 
-Here's the inverse case - where we'd like to store Post data into the User record. Note there are 'many' posts.
+Here's another case - where we'd like to store Post data into the User record. Note there are 'many' posts.
 
     class User
       include Mongoid::Document
@@ -65,25 +71,26 @@ Here's the inverse case - where we'd like to store Post data into the User recor
     end
 
     # Post data now saves into the User record
-    @user.posts = [Post.create!(:title => "Building a new bike", :category => "Cycling")]
-    @user.save!
-    @user.posts_fields #=> [{ "title" => "Building a new bike", :category => "Cycling" }]
+    @user.posts << Post.create!(:title => "Building a new bike", :category => "Cycling")
+    @user.posts << Post.create!(:title => "Bay Area Kayaking", :category => "Kayaking")
+    @user.posts_fields #=> [{ "title" => "Building a new bike", :category => "Cycling" },
+                            { "title" => "Bay Area Kayaking", :category => "Kayaking" }]
 
 One-to-one, many-to-one, one-to-many, and many-to-many referenced relations are all supported.
 
 Changes made to the denormalized models will be propagated to the document(s)
 where that data has been denormalized for saves *and* destroys.
 
-Migration
----------
-Once you've added your alize configuration, your new fields will not yet be populated. Here's what a typical migration looks like:
+Migration / First-time installation
+-----------------------------------
+Once you've added your alize configuration you'll need to populate your new fields with data. Here's what a typical migration looks like for one model:
 
     User.all.each do |user|
       user.force_denormalization = true
       user.save!
     end
 
-Assuming User is the model w/ denormalized relations, this will iterate over your users and cause alize to denormalize data from the relations you have specified. The `force_denormalization` flag is needed because although the user's relations have not changed you'd like to denormalize them during this save lifecycle anyway.
+Assuming User is the model w/ denormalized relations, this will iterate over your users and cause alize to denormalize data from the relations you have specified. Because the user's relations have not "changed" (in the ActiveModel attributes sense) the `force_denormalization` flag is needed.
 
 Advanced Usage
 --------------
@@ -96,49 +103,87 @@ This is ideal for say, doing denormalization in the background. The traditional 
     end
     handle_asynchronously :denormalize_from_user
 
-(This extra business is needed because it's not always predictable when denormalize methods get defined by a class due to callback methods definitions coming in from the inverse.)
+(Note: This extra business is needed because it's not always predictable when denormalize methods get defined by a class since callback method definitions can be defined from the inverse side.)
 
 `default_alize_fields` is the method used to generate the denormalization field list when no fields are passed to `alize`. Override to set an alternative field list for your model.
 
-Examples
---------
+Examples and specs
+------------------
 Check out [spec/mongoid_alize_spec.rb](https://github.com/dzello/mongoid_alize/blob/master/spec/mongoid_alize_spec.rb) to see working examples across all types of relations.
 
 Changelog
 ---------
 
-### Release 0.2.0
+### Release 0.3.0
 
-#### denormalize_from callbacks now invoked on save
+#### Unifying the API
 
-These callbacks are now called on save in addition to create. This makes sure that modified relations get picked up and denormalized fields get changed as a result. Where predictable dirty checking is possible it is used to skip unneeded callbacks. Where a dirty status cannot reliably be inferred, the denormalize callback is triggered. While there might be a slight performance hit, I believe the guarantee of consistent data is more important. Future optimizations will be able to skip callbacks more eagerly.
+mongoid_alize 0.3.0 is imcompatible with previous versions for one-to-one relations. Previous versions defined fields of the form `%{relation}_%{field_name}`, e.g. `post_username` to store the username from post. This caused the implementation of one-to-one and one-to-many relations to be quite different, and it made handling polymorphic associations infeasible because fields are different for each related model. There are several other reasons why this setup wasn't optimal: data types for one-to-ones had to be considered up-front, and creating distinct groups of denormalized fields based on the same relation (something planned for in the future) wouldn't be possible. Last but not least, this makes the eventual handling of this JSON by a client more symmetrical (e.g. my code to instantiate nested Backbone.js models from denormalized data became much more concise).
 
-#### Denormalization of methods (a.k.a lazily computed pseudo-attributes) is now supported for all relations
+The bottom line is that it all works the same now. If you're doing a one-to-one from a `user` relation, the denormalized data is stored as a Hash in a `user_fields`. If you are doing a many-to-one, it's still `user_fields` - but as an Array. And if it's polymorphic in either case, it's still `user_fields`, but the fields stored might be different each time.
 
-Because methods don't have explicit return types, there are a few rules around the type definition of the field that will hold the method's data.
+#### Polymorphic support
 
-+ If the field isn't defined it's type will be set to `String`.
-+ If a field is already defined, it will not be redefined. This allows you to define the field in advance and give it the type you like.
+Polymorphic relations are supported. That said, there are two things to be aware of.
 
-For example, if you are denormalizing a method `User#birthday` and you'd like birthday to be stored as a date, you might do this:
+One is the natural limitation of the `alize` macro when it comes to polymorphic relations - the Class of the object stored by the relation is known only at runtime. So, when you specify `alize` on the polymorphic side (the side with the `:polymorphic => true` argument to the relation), `alize` cannot apply the to-side macro automatically - it doesn't know how to find the inverse(s). To still get to-side behavior, you'll need to add the `alize_to` macro for any class/relation that can be an inverse (i.e. any relation that uses the `:as => :something` parameter to the relation definition.)
 
-    class Invitation
-      belongs_to :user
-      field :user_birthday, Date
-      alize :user, :birthday
+The second challenge is that the fields to denormalize will likely be different on per-inverse basis. Perhaps your `:addressable` relation can store both homes and offices but needs to store different fields for each (e.g. offices have a company name, and homes belong to owners). This can be accomplished by passing a proc to the `:fields` option key when defining the relation. The block will be passed the model instance in question:
+
+    alize :addressable, :fields => lambda { |addressable|
+      if addressable.is_a?(Home)
+        [:owner_name]
+      elsif addressable.is_a?(Office)
+        [:company_name]
+      end
+    }
+
+Protip - In practice, rather than doing ugly type checking, I implement a method on any class that can be addressable that returns a list of fields:
+
+    class Home
+      def alize_fields_for_addressable
+        [:owner_name]
+      end
     end
 
-#### Method aliasing
+    class Office
+      def alize_fields_for_addressable
+        [:company_name]
+      end
+    end
 
-The generated, public `denormalize_to_foo` callbacks now also have protected aliases that begin with \_. And alize will not override these callbacks if you have already set them. This allows you to define the callbacks yourselves, do whatever you need, and tell alize to do what it otherwise would. This also makes it possible to annotate methods (i.e. `handle_asynchronously`) because can control the place at which they are defined.
+    alize :addressable, :fields => lambda { |addressable| addressable.alize_fields_for_addressable }
 
-#### Other misc updates
-+ Several performance boosts via combining field updates and dirty checking. (That said, the big performance gains like advanced dirty checking and bulk updates are coming in 0.3. This release was focused on features and usability.)
-+ Duplicate callbacks no longer added due to development environment class reloading
-+ Error classes w/ I18n support. Errors where fields in the alize definition do not exist are raised.
-+ Denormalize `:id` just like any other attribute in any relation type.
-+ A `force` param for the aliased denormalize methods (to skip dirty checking) as well as a `force_denormalization` attribute to instruct a class to fire all callbacks regardless of dirty status.
-+ Updated 'scenario' spec - `mongoid_alize_spec.rb` with new use cases
+Note the fields option is valid for anything you alize.
+
+### denormalize_from_all and denormalize_to_all hooks
+Each class where `Mongoid::Alize` is included has two new methods - `denormalize_from_all` and `denormalize_to_all`. These methods run all of the alize callbacks (in the appropriate direction) for that model.
+
+This comes in handy when you want to trigger denormalization without going through the save callback cycle. Keep in mind that denormalize_from methods do not automatically persist the data that's updated in the model (b/c they're traditionally used in a before save). So if you call `denormalize_from_all` you'll need to handle persistance yourself - usually through atomic mongoid operations like `set`.
+
+Protip: If you need even more flexibility, you now have access to alize's callback metadata in either direction via the class methods `alize_from_callbacks` and `alize_to_callbacks`. Each is an array of `Mongoid::Alize::Callback` objects.
+
+Protip #2: Make sure to pair with the `force_denormalization` attr if you want all callbacks to skip dirty checking (appropriate for batch updates, sync-ing stale data, etc)
+
+Protip #3: I use this to fire `to` denormalizations after `to` denormalizations (and this will be the default behavior soon). If you are denormalizing denormalized data (meta, I know) you can use this to make sure updates to a model trigger denormalization to *it's* model's.
+
+### Speed
+One-to-one performance is dramatically improved. Updating all fields is accomplished via one `set` operation.
+
+#### Misc 0.3.0 updates
+- `alize_to` and `alize_from` are available separately if you only want one type of behavior for a relation. `alize` still does both (except for polymorphic relations, in which case it acts as `alize_from`)
+- You can pass a `:fields` proc to any `alize` to dynamically determine stores fields at the instance level.
+
+#### Upgrading
+You'll need to rewrite the parts of your application that use one-to-one denormalization. Instead of finding data in a `post_title` field, you'll be looking in `post_fields["title"]`.
+After updating your code, re-denormalize your data with 0.3.0 installed (loop through objects and call save with the `force_denormalization` attr set to true).
+
+#### Will the API keep changing?
+It's my intent to follow the [Semantic Versioning Spec](http://semver.org). So until 1.0, it's possible that breaking changes may be introduced. I'll do my best to outline the changes each time and give advice on how to respond to changes. The goal is to get to 1.0 as quickly as possible, but there is still some real-world mileage to cover.
+
+Changelog
+---------
+Read the cumulative changelog [here](https://github.com/dzello/mongoid_alize/blob/master/CHANGELOG.md).
 
 Tests / Contributing
 -------------
@@ -152,7 +197,7 @@ Contributions and bug reports are welcome.
 Todos/Coming Soon
 -----------------
 + Mongoid 3 Support
-+ Performance improvements and batch updates
++ Performance improvements
 + Your feature requests and issues!
 
 Credits / License
