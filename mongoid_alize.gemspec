@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "mongoid_alize"
-  s.version     = "0.3.0"
+  s.version     = "0.3.1"
   s.author      = "Josh Dzielak"
   s.email       = "github_public@dz.oib.com"
   s.homepage    = "https://github.com/dzello/mongoid_alize"
