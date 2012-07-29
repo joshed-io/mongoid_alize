@@ -57,7 +57,7 @@ describe Mongoid::Alize do
       it "should nillify person fields in head when person is destroyed" do
         @head.update_attributes!(:person_fields => { "name" => "Old Gregg", "location" => "Paris" })
         @person.destroy
-        @head.person_fields.should == {}
+        @head.person_fields.should be_nil
       end
     end
 
@@ -91,7 +91,7 @@ describe Mongoid::Alize do
       it "should nillify head fields in person when head is destroyed" do
         @person.update_attributes!(:head_fields => { "size" => "1000 balloons"})
         @head.destroy
-        @person.head_fields.should == {}
+        @person.head_fields.should be_nil
       end
     end
   end
@@ -127,7 +127,7 @@ describe Mongoid::Alize do
       it "should nillify captor fields when person is destroyed" do
         @head.update_attributes!(:captor => { "name" => "Old Gregg"})
         @person.destroy
-        @head.captor_fields.should == {}
+        @head.captor_fields.should be_nil
       end
     end
 

@@ -56,7 +56,7 @@ module Mongoid
               is_one = #{is_one?}
               prefixed_name = #{prefixed_name}
               if is_one
-                  relation.set(prefixed_name, {})
+                relation.set(prefixed_name, nil)
               else
                 #{pull_from_inverse}
               end

@@ -29,7 +29,7 @@ describe Mongoid::Alize::ToCallback do
 
     before do
       Head.class_eval do
-        field :person_fields, :type => Hash, :default => {}
+        field :person_fields, :type => Hash, :default => nil
       end
     end
 
@@ -49,7 +49,7 @@ describe Mongoid::Alize::ToCallback do
       end
 
       it "should push the fields to the relation" do
-        @head.person_fields.should == {}
+        @head.person_fields.should == nil
         run_callback
         @head.person_fields.should == person_fields
       end
@@ -67,7 +67,7 @@ describe Mongoid::Alize::ToCallback do
       it "should nillify the fields in the relation" do
         @head.person_fields = { "hi" => "hello" }
         run_destroy_callback
-        @head.person_fields.should == {}
+        @head.person_fields.should be_nil
       end
 
       it "should do nothing if the relation doesn't exist" do
@@ -90,7 +90,7 @@ describe Mongoid::Alize::ToCallback do
 
     before do
       Head.class_eval do
-        field :nearest_fields, :type => Hash, :default => {}
+        field :nearest_fields, :type => Hash, :default => nil
       end
     end
 
@@ -110,7 +110,7 @@ describe Mongoid::Alize::ToCallback do
       end
 
       it "should push the fields to the relation" do
-        @head.nearest_fields.should == {}
+        @head.nearest_fields.should be_nil
         run_callback
         @head.nearest_fields.should == nearest_fields
       end
@@ -128,7 +128,7 @@ describe Mongoid::Alize::ToCallback do
       it "should nillify the fields in the relation" do
         @head.nearest_fields = { "hi" => "hello" }
         run_destroy_callback
-        @head.nearest_fields.should == {}
+        @head.nearest_fields.should be_nil
       end
 
       it "should do nothing if the relation doesn't exist" do
@@ -151,7 +151,7 @@ describe Mongoid::Alize::ToCallback do
 
     before do
       Person.class_eval do
-        field :nearest_head_fields, :type => Hash, :default => {}
+        field :nearest_head_fields, :type => Hash, :default => nil
       end
     end
 
@@ -169,7 +169,7 @@ describe Mongoid::Alize::ToCallback do
       end
 
       it "should push the fields to the relation" do
-        @person.nearest_head_fields.should == {}
+        @person.nearest_head_fields.should be_nil
         run_callback
         @person.nearest_head_fields.should == nearest_head_fields
       end
@@ -187,7 +187,7 @@ describe Mongoid::Alize::ToCallback do
       it "should nillify the fields in the relation" do
         @person.nearest_head_fields = { "hi" => "hello" }
         run_destroy_callback
-        @person.nearest_head_fields.should == {}
+        @person.nearest_head_fields.should be_nil
       end
 
       it "should do nothing if the relation doesn't exist" do

@@ -77,7 +77,7 @@ describe Mongoid::Alize::Callbacks::From::One do
       @head.person = nil
       @head.should be_person_id_changed
       run_callback
-      @head.person_fields.should == {}
+      @head.person_fields.should == nil
     end
 
     it "should not run if the relation has not changed" do
@@ -130,7 +130,7 @@ describe Mongoid::Alize::Callbacks::From::One do
       @person.save!
       @person.head = nil
       run_callback
-      @person.head_fields.should == {}
+      @person.head_fields.should be_nil
     end
 
     it "should run even if the relation has not changed" do

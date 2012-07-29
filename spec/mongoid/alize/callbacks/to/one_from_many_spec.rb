@@ -29,7 +29,7 @@ describe Mongoid::Alize::ToCallback do
 
     before do
       Head.class_eval do
-        field :captor_fields, :type => Hash, :default => {}
+        field :captor_fields, :type => Hash, :default => nil
       end
     end
 
@@ -49,7 +49,7 @@ describe Mongoid::Alize::ToCallback do
       end
 
       it "should push the fields to the relation" do
-        @head.captor_fields.should == {}
+        @head.captor_fields.should be_nil
         run_callback
         @head.captor_fields.should == captor_fields
       end
@@ -67,7 +67,7 @@ describe Mongoid::Alize::ToCallback do
       it "should remove the fields from the relation" do
         @head.captor_fields = { "hi" => "hello" }
         run_destroy_callback
-        @head.captor_fields.should == {}
+        @head.captor_fields.should be_nil
       end
 
       it "should do nothing if the relation doesn't exist" do
@@ -90,7 +90,7 @@ describe Mongoid::Alize::ToCallback do
 
     before do
       Person.class_eval do
-        field :above_fields, :type => Hash, :default => {}
+        field :above_fields, :type => Hash, :default => nil
       end
     end
 
@@ -108,7 +108,7 @@ describe Mongoid::Alize::ToCallback do
       end
 
       it "should push the fields to the relation" do
-        @person.above_fields.should == {}
+        @person.above_fields.should be_nil
         run_callback
         @person.above_fields.should == above_fields
       end
@@ -126,7 +126,7 @@ describe Mongoid::Alize::ToCallback do
       it "should remove the fields from the relation" do
         @person.above_fields = { "hi" => "hello" }
         run_destroy_callback
-        @person.above_fields.should == {}
+        @person.above_fields.should be_nil
       end
 
       it "should do nothing if the relation doesn't exist" do

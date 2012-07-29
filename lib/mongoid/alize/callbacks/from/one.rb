@@ -16,7 +16,7 @@ module Mongoid
                   if relation = self.#{relation}
                     self.#{self.prefixed_name} = #{field_values("relation")}
                   else
-                    self.#{self.prefixed_name} = {}
+                    self.#{self.prefixed_name} = nil
                   end
 
                 end
