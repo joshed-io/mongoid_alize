@@ -30,7 +30,7 @@ module Mongoid
           def define_fields
             ensure_field_not_defined!(prefixed_name, klass)
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
-              field :#{prefixed_name}, :type => Hash, :default => {}
+              field :#{prefixed_name}, :type => Hash, :default => nil
             CALLBACK
 
             define_fields_method

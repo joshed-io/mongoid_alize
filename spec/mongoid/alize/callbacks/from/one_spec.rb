@@ -21,10 +21,10 @@ describe Mongoid::Alize::Callbacks::From::One do
         Head.fields["person_fields"].type.should == Hash
       end
 
-      it "should default the field to empty" do
+      it "should default the field to nil" do
         callback = new_callback
         callback.send(:define_fields)
-        Head.new.person_fields.should == {}
+        Head.new.person_fields.should be_nil
       end
 
       it "should raise an already defined field error if the field already exists" do
