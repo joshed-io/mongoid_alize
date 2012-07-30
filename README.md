@@ -116,7 +116,7 @@ Changelog
 
 ### Release 0.3.0
 
-#### Unifying the API
+#### Unifying how data is stored
 
 mongoid_alize 0.3.0 is imcompatible with previous versions for one-to-one relations. Previous versions defined fields of the form `%{relation}_%{field_name}`, e.g. `post_username` to store the username from post. This caused the implementation of one-to-one and one-to-many relations to be quite different, and it made handling polymorphic associations infeasible because fields are different for each related model. There are several other reasons why this setup wasn't optimal: data types for one-to-ones had to be considered up-front, and creating distinct groups of denormalized fields based on the same relation (something planned for in the future) wouldn't be possible. Last but not least, this makes the eventual handling of this JSON by a client more symmetrical (e.g. my code to instantiate nested Backbone.js models from denormalized data became much more concise).
 
