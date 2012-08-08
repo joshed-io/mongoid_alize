@@ -1,8 +1,7 @@
 source 'https://rubygems.org'
 
 group :development, :test do
-  gem 'mongoid'
-  gem 'bson_ext', '1.6.1'
+  gem 'mongoid', '>= 3'
 
   gem 'rspec'
   gem 'rr'
