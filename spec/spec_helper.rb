@@ -4,9 +4,19 @@ require 'awesome_print'
 require 'wirble'
 require 'mongoid'
 
+def three?
+  Mongoid::VERSION =~ /^3/
+end
+
 Mongoid.configure do |config|
-  config.master = Mongo::Connection.new("localhost", 27017,
+  if three?
+    config.connect_to("mongoid_alize_test")
+    Moped.logger = Logger.new("log/test.log")
+    Moped.logger.level = Logger::DEBUG
+  else
+    config.master = Mongo::Connection.new("localhost", 27017,
                     :logger => Logger.new("log/test.log")).db("mongoid_alize_test")
+  end
 end
 
 require File.expand_path("../../lib/mongoid_alize", __FILE__)
@@ -18,7 +28,7 @@ RSpec.configure do |config|
 
   config.mock_with :rr
   config.before :each do
-    Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+    Mongoid.purge!
 
     persistent_fields = {
       Object => [:_id, :_type],
