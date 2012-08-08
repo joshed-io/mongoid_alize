@@ -47,14 +47,14 @@ describe Mongoid::Alize::Callbacks::From::Many do
       { "_id" => @person.id,
         "name"=> "Bob",
         "location" => "Paris",
-        "created_at"=> @now.to_s(:utc) }
+        "created_at" => @now }
     end
 
     before do
       now = Time.now
       stub(Time).now { now }
       @head = Head.create
-      @person = Person.create(:name => "Bob", :created_at => @now = Time.now)
+      @person = Person.create(:name => "Bob")
 
       @head.relations["wanted_by"].should be_stores_foreign_key
     end

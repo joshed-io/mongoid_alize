@@ -19,7 +19,7 @@ describe Mongoid::Alize::ToCallback do
   describe "with metadata in advance" do
     def create_models
       @head = Head.create(
-        :captor => @person = Person.create(:name => "Bob", :created_at => @now = Time.now))
+        :captor => @person = Person.create(:name => "Bob"))
       @person.heads = [@head]
     end
 
@@ -37,7 +37,7 @@ describe Mongoid::Alize::ToCallback do
       def captor_fields
         { "name"=> "Bob",
           "location" => "Paris",
-          "created_at"=> @now.to_s(:utc) }
+          "created_at"=> @now }
       end
 
       def run_callback

@@ -23,8 +23,7 @@ describe Mongoid::Alize::ToCallback do
 
     def create_models
       @head = Head.create(
-        :person => @person = Person.create(:name => "Bob",
-                                           :created_at => @now = Time.now))
+        :person => @person = Person.create(:name => "Bob"))
     end
 
     before do
@@ -37,7 +36,7 @@ describe Mongoid::Alize::ToCallback do
       def person_fields
         { "name"=> "Bob",
           "location" => "Paris",
-          "created_at"=> @now.to_s(:utc) }
+          "created_at"=> @now }
       end
 
       def run_callback
@@ -84,8 +83,7 @@ describe Mongoid::Alize::ToCallback do
 
     def create_models
       @head = Head.create(
-        :nearest => @person = Person.create(:name => @name = "Bob",
-                                           :created_at => @now = Time.now))
+        :nearest => @person = Person.create(:name => @name = "Bob"))
     end
 
     before do
@@ -98,7 +96,7 @@ describe Mongoid::Alize::ToCallback do
       def nearest_fields
         { "name"=> "Bob",
           "location" => "Paris",
-          "created_at"=> @now.to_s(:utc) }
+          "created_at"=> @now }
       end
 
       def run_callback

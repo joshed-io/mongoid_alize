@@ -48,13 +48,12 @@ describe Mongoid::Alize::Callbacks::From::One do
     def person_fields
       { "name"=> "Bob",
         "location" => "Paris",
-        "created_at"=> @now.to_s(:utc) }
+        "created_at"=> @now }
     end
 
     def create_models
       @head = Head.create
-      @person = Person.create(:name => @name = "Bob",
-                              :created_at => @now = Time.now)
+      @person = Person.create(:name => @name = "Bob")
     end
 
     before do
