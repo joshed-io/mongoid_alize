@@ -84,7 +84,7 @@ describe Mongoid::Alize do
       end
 
       it "should push data to person" do
-        @head.update_attributes!(:size => @size = "20lbs")
+        @head.update_attributes!(:size => @size = 20)
         assert_person
       end
 
@@ -394,7 +394,7 @@ describe Mongoid::Alize do
     before do
       Head.send(:alize, :below_people, :fields => lambda { |inverse|
         self.alize_fields(inverse) })
-      @head.below_people = [@person]
+      @head.below_people << @person
     end
 
     def assert_head
@@ -500,7 +500,7 @@ describe Mongoid::Alize do
     before do
       fields = { :fields => lambda { |inverse| [:name, :location] } }
       Head.send(:alize, :below_people, fields)
-      @head.below_people = [@person]
+      @head.below_people << @person
       @head.save!
     end
 

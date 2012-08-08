@@ -19,8 +19,7 @@ describe Mongoid::Alize::ToCallback do
   describe "with metadata in advance" do
     def create_models
       @head = Head.create(
-        :sees => [@person = Person.create(:name => "Bob",
-                                          :created_at => @now = Time.now)])
+        :sees => [@person = Person.create(:name => "Bob")])
       @person.seen_by = @head
     end
 
@@ -32,7 +31,7 @@ describe Mongoid::Alize::ToCallback do
       { "_id" => @person.id,
         "name"=> "Bob",
         "location" => "Paris",
-        "created_at"=> @now.to_s(:utc) }
+        "created_at"=> @now }
     end
 
     def other_see

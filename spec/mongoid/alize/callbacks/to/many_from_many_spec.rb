@@ -17,7 +17,7 @@ describe Mongoid::Alize::ToCallback do
     { "_id" => @person.id,
         "name" => "Bob",
         "location" => "Paris",
-        "created_at"=> @now.to_s(:utc) }
+        "created_at" => @now }
   end
 
   def other_wanted_by
@@ -26,8 +26,7 @@ describe Mongoid::Alize::ToCallback do
 
   def create_models
     @head = Head.create(
-      :wanted_by => [@person = Person.create(:name => "Bob",
-                                      :created_at => @now = Time.now)])
+      :wanted_by => [@person = Person.create(:name => "Bob")])
     @person.wants = [@head]
   end
 
