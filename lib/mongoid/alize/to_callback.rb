@@ -85,7 +85,7 @@ module Mongoid
           ":#{inverse_relation}_fields"
         else
           <<-RUBIES
-            (#{find_relation}[0].to_s + '_fields')
+            (#{find_relation}.name.to_s + '_fields')
           RUBIES
         end
       end
@@ -99,13 +99,13 @@ module Mongoid
           end
         else
           <<-RUBIES
-            (#{find_relation}[1].relation.superclass == Mongoid::Relations::One)
+            (#{find_relation}.relation.superclass == Mongoid::Relations::One)
           RUBIES
         end
       end
 
       def find_relation
-        "relation.class.relations.find { |name, metadata| metadata.inverse == :#{relation} && metadata.class_name == self.class.name }"
+        "relation.class.relations.values.find { |metadata| metadata.inverse(self) == :#{relation} && metadata.class_name == self.class.name }"
       end
 
       def iterable_relation
