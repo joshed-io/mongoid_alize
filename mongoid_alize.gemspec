@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "mongoid_alize"
-  s.version     = "0.3.1"
+  s.version     = "0.4.0"
   s.author      = "Josh Dzielak"
   s.email       = "github_public@dz.oib.com"
   s.homepage    = "https://github.com/dzello/mongoid_alize"
@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.files        = Dir["{config,lib,spec}/**/*"] - ["Gemfile.lock"]
   s.require_path = "lib"
 
-  s.add_dependency 'mongoid', '~> 2'
+  s.add_dependency 'mongoid', ">= 2.4"
   s.add_development_dependency 'rspec', '~> 2.6.0'
 end
