@@ -4,6 +4,9 @@ Mongoid::Alize
 
 ## Changelog
 
+### Release 0.4.0
+Support for Mongoid 3.
+
 ### Release 0.3.0
 
 See README.md.

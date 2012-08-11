@@ -7,8 +7,6 @@ Mongoid::Alize
 Mongoid Alizé helps you improve your Mongoid application's
 read performance by making it easy to store related data together.
 
-### 0.3.0 introduces breaking API changes, read the changelog below.
-
 Features of Mongoid Alizé
 -------------------------
 - Extremely light DSL and easy setup
@@ -19,6 +17,7 @@ Features of Mongoid Alizé
 - Custom callbacks and exposed metadata provide flexibility and extensibility (e.g. asynchronous denormalization)
 - Comprehensive test suite with dozens of examples
 - The [wiki](https://github.com/dzello/mongoid_alize/wiki), soon to be full of war stories and protips.
+- Supports mongoid 3+ and mongoid 2.4+
 
 Installation
 ------------
@@ -196,7 +195,6 @@ Contributions and bug reports are welcome.
 
 Todos/Coming Soon
 -----------------
-+ Mongoid 3 Support
 + Performance improvements
 + Your feature requests and issues!
 
