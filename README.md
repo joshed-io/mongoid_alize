@@ -112,6 +112,8 @@ Check out [spec/mongoid_alize_spec.rb](https://github.com/dzello/mongoid_alize/b
 
 Changelog
 ---------
+### Release 0.4.0
+Now supporting Mongoid 3.
 
 ### Release 0.3.0
 
@@ -180,9 +182,6 @@ After updating your code, re-denormalize your data with 0.3.0 installed (loop th
 #### Will the API keep changing?
 It's my intent to follow the [Semantic Versioning Spec](http://semver.org). So until 1.0, it's possible that breaking changes may be introduced. I'll do my best to outline the changes each time and give advice on how to respond to changes. The goal is to get to 1.0 as quickly as possible, but there is still some real-world mileage to cover.
 
-Changelog
----------
-Read the cumulative changelog [here](https://github.com/dzello/mongoid_alize/blob/master/CHANGELOG.md).
 
 Tests / Contributing
 -------------
