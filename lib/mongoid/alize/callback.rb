@@ -81,7 +81,7 @@ module Mongoid
           (#{fields_method_name}(#{source}) + #{extras}).inject({}) { |hash, name|
             hash[name] = #{source}.send(name)
             hash
-          }
+          }.mongoize
         RUBY
       end
 
