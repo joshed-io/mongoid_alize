@@ -1,5 +1,6 @@
-Mongoid::Alize
+Mongoid::Alize [![Code Climate](https://codeclimate.com/github/dzello/mongoid_alize.png)](https://codeclimate.com/github/dzello/mongoid\_alize)
 ==============
+
 **Comprehensive, flexible denormalization for Mongoid that stays in sync**
 
 > Everything *and* the kitchen sync...
