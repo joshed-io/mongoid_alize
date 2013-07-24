@@ -43,7 +43,7 @@ describe Mongoid::Alize::ToCallback do
 
     before do
       @callback = new_callback
-      @callback.send(:define_fields)
+      @callback.send(:define_fields_method)
       create_models
       @callback.send(:define_callback)
     end
@@ -75,7 +75,7 @@ describe Mongoid::Alize::ToCallback do
 
     before do
       @callback = new_callback
-      @callback.send(:define_fields)
+      @callback.send(:define_fields_method)
       create_models
       @callback.send(:define_destroy_callback)
     end

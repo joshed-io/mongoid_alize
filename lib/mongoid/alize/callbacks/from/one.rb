@@ -32,8 +32,6 @@ module Mongoid
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               field :#{prefixed_name}, :type => Hash, :default => {}
             CALLBACK
-
-            define_fields_method
           end
         end
       end

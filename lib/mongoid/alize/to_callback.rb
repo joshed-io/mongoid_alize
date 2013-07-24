@@ -3,7 +3,7 @@ module Mongoid
     class ToCallback < Callback
 
       def attach
-        define_fields
+        define_fields_method
 
         define_callback
         alias_callback
@@ -110,10 +110,6 @@ module Mongoid
 
       def iterable_relation
         "[self.#{relation}].flatten.compact"
-      end
-
-      def define_fields
-        define_fields_method
       end
 
       def set_callback
