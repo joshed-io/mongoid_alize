@@ -63,6 +63,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
       before do
         @callback = new_callback
         @callback.send(:define_fields)
+        @callback.send(:define_fields_method)
         @callback.send(:define_callback)
       end
 
@@ -110,6 +111,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
 
       @callback = klass.new(Head, :sees, [:name])
       @callback.send(:define_fields)
+      @callback.send(:define_fields_method)
       @callback.send(:define_callback)
 
       @head.relations["sees"].should_not be_stores_foreign_key

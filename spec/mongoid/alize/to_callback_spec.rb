@@ -15,7 +15,7 @@ describe Mongoid::Alize::ToCallback do
 
   def define_and_create(callback_name=:define_callback)
     @callback = new_callback
-    @callback.send(:define_fields)
+    @callback.send(:define_fields_method)
     create_models
     @callback.send(callback_name)
   end
@@ -50,7 +50,7 @@ describe Mongoid::Alize::ToCallback do
   describe "#define_fields" do
     it "should define the fields method" do
       mock(@callback).define_fields_method
-      @callback.send(:define_fields)
+      @callback.send(:define_fields_method)
     end
   end
 

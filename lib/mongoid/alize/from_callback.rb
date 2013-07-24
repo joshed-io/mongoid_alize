@@ -4,6 +4,7 @@ module Mongoid
 
       def attach
         define_fields
+        define_fields_method
 
         define_callback
         alias_callback

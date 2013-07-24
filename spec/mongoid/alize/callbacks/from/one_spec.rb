@@ -59,6 +59,7 @@ describe Mongoid::Alize::Callbacks::From::One do
     before do
       @callback = new_callback
       @callback.send(:define_fields)
+      @callback.send(:define_fields_method)
       create_models
       @callback.send(:define_callback)
     end
@@ -108,6 +109,7 @@ describe Mongoid::Alize::Callbacks::From::One do
     before do
       @callback = klass.new(Person, :head, [:size])
       @callback.send(:define_fields)
+      @callback.send(:define_fields_method)
 
       @person = Person.create
       @head = Head.create(:size => 5)
