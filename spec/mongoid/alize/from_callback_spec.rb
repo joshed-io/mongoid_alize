@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class Mongoid::Alize::SpecFromCallback < Mongoid::Alize::FromCallback
-  def define_fields
+  def define_mongoid_field
   end
 
   def define_callback

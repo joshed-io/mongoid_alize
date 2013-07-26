@@ -34,7 +34,7 @@ describe Mongoid::Alize::Callback do
       callback.inverse_klass = Person
       callback.inverse_relation = :head
       callback.inverse_metadata.should == Person.relations["head"]
-      callback.fields.should == [:name, :created_at]
+      callback.denorm_attrs.should == [:name, :created_at]
     end
 
     it "should not set inverses for the child in a polymorphic association" do
@@ -83,37 +83,37 @@ describe Mongoid::Alize::Callback do
       @callback.aliased_callback_name.should == "denormalize_spec_person"
     end
 
-    it "should add _fields to the callback name" do
-      @callback.fields_method_name.should == "_denormalize_spec_person_fields"
+    it "should add _attrs to the callback name" do
+      @callback.denorm_attrs_name.should == "_denormalize_spec_person_attrs"
     end
   end
 
-  describe "define fields method" do
-    def define_fields_method
-      @callback.send(:define_fields_method)
+  describe "#define_denorm_attrs" do
+    def define_denorm_attrs
+      @callback.send(:define_denorm_attrs)
     end
 
-    describe "when fields is an array" do
+    describe "when denorm_attrs is an array" do
       before do
         @callback = new_callback
       end
 
-      it "should return the fields w/ to_s applied" do
-        define_fields_method
+      it "should return the denorm_attrs w/ to_s applied" do
+        define_denorm_attrs
         @head = Head.new
-        @head.send("_denormalize_spec_person_fields", nil).should == ["name", "created_at"]
+        @head.send("_denormalize_spec_person_attrs", nil).should == ["name", "created_at"]
       end
     end
 
-    describe "when fields is a proc" do
+    describe "when denorm_attrs is a proc" do
       before do
         @callback = klass.new(Head, :person, lambda { |inverse| [:name, :created_at] })
       end
 
-      it "should return the fields w/ to_s applied" do
-        define_fields_method
+      it "should return the denorm_attrs w/ to_s applied" do
+        define_denorm_attrs
         @head = Head.new
-        @head.send("_denormalize_spec_person_fields", Person.new).should == ["name", "created_at"]
+        @head.send("_denormalize_spec_person_attrs", Person.new).should == ["name", "created_at"]
       end
     end
   end
