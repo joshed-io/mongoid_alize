@@ -3,7 +3,7 @@ module Mongoid
     class ToCallback < Callback
 
       def attach
-        define_fields_method
+        define_denorm_attrs
 
         define_callback
         alias_callback
