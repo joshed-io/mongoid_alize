@@ -11,7 +11,7 @@ describe Mongoid::Alize::ToCallback do
 
   def define_and_create(callback_name=:define_callback)
     @callback = new_callback
-    @callback.send(:define_fields)
+    @callback.send(:define_denorm_attrs)
     create_models
     @callback.send(callback_name)
   end

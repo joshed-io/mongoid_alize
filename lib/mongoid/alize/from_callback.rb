@@ -3,7 +3,8 @@ module Mongoid
     class FromCallback < Callback
 
       def attach
-        define_fields
+        define_mongoid_field
+        define_denorm_attrs
 
         define_callback
         alias_callback
