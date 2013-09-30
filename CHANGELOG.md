@@ -4,6 +4,9 @@ Mongoid::Alize
 
 ## Changelog
 
+### Unreleased
+Code cleanup and method renaming for clarity.
+
 ### Release 0.4.0
 Support for Mongoid 3.
 
