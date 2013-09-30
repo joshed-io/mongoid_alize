@@ -2,7 +2,7 @@ module Mongoid
   module Alize
     class Callback
 
-      attr_accessor :fields
+      attr_accessor :denorm_attrs
 
       attr_accessor :klass
       attr_accessor :relation
@@ -14,12 +14,12 @@ module Mongoid
 
       attr_accessor :debug
 
-      def initialize(_klass, _relation, _fields)
+      def initialize(_klass, _relation, _denorm_attrs)
         self.debug = ENV["ALIZE_DEBUG"]
 
         self.klass = _klass
         self.relation = _relation
-        self.fields = _fields
+        self.denorm_attrs = _denorm_attrs
 
         self.metadata = _klass.relations[_relation.to_s]
         if !(self.metadata.polymorphic? &&
@@ -58,27 +58,27 @@ module Mongoid
         "denormalize_#{direction}_#{relation}"
       end
 
-      def define_fields_method
-        _fields = fields
-        if fields.is_a?(Proc)
-          klass.send(:define_method, fields_method_name) do |inverse|
-            _fields.bind(self).call(inverse).map(&:to_s)
+      def define_denorm_attrs
+        _denorm_attrs = denorm_attrs
+        if denorm_attrs.is_a?(Proc)
+          klass.send(:define_method, denorm_attrs_name) do |inverse|
+            _denorm_attrs.bind(self).call(inverse).map(&:to_s)
           end
         else
-          klass.send(:define_method, fields_method_name) do |inverse|
-            _fields.map(&:to_s)
+          klass.send(:define_method, denorm_attrs_name) do |inverse|
+            _denorm_attrs.map(&:to_s)
           end
         end
       end
 
-      def fields_method_name
-        "#{callback_name}_fields"
+      def denorm_attrs_name
+        "#{callback_name}_attrs"
       end
 
       def field_values(source, options={})
         extras = options[:id] ? "['_id']" : "[]"
         <<-RUBY
-          (#{fields_method_name}(#{source}) + #{extras}).inject({}) { |hash, name|
+          (#{denorm_attrs_name}(#{source}) + #{extras}).inject({}) { |hash, name|
             hash[name] = #{source}.send(name)
             hash
           }.mongoize

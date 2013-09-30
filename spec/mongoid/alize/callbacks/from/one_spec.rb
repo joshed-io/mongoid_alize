@@ -13,17 +13,17 @@ describe Mongoid::Alize::Callbacks::From::One do
     klass.new(*args)
   end
 
-  describe "#define_fields" do
+  describe "#define_mongoid_field" do
     describe "with an array of fields" do
       it "should add a field generated from %{relation}_fields" do
         callback = new_callback
-        callback.send(:define_fields)
+        callback.send(:define_mongoid_field)
         Head.fields["person_fields"].type.should == Hash
       end
 
       it "should default the field to empty" do
         callback = new_callback
-        callback.send(:define_fields)
+        callback.send(:define_mongoid_field)
         Head.new.person_fields.should == {}
       end
 
@@ -33,7 +33,7 @@ describe Mongoid::Alize::Callbacks::From::One do
         end
         callback = new_callback
         expect {
-          callback.send(:define_fields)
+          callback.send(:define_mongoid_field)
         }.to raise_error(Mongoid::Alize::Errors::AlreadyDefinedField,
                          "person_fields is already defined on the Head model.")
       end
@@ -58,7 +58,8 @@ describe Mongoid::Alize::Callbacks::From::One do
 
     before do
       @callback = new_callback
-      @callback.send(:define_fields)
+      @callback.send(:define_mongoid_field)
+      @callback.send(:define_denorm_attrs)
       create_models
       @callback.send(:define_callback)
     end
@@ -107,7 +108,8 @@ describe Mongoid::Alize::Callbacks::From::One do
 
     before do
       @callback = klass.new(Person, :head, [:size])
-      @callback.send(:define_fields)
+      @callback.send(:define_mongoid_field)
+      @callback.send(:define_denorm_attrs)
 
       @person = Person.create
       @head = Head.create(:size => 5)
