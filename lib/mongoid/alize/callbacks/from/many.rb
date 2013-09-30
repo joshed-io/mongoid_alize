@@ -19,13 +19,11 @@ module Mongoid
             CALLBACK
           end
 
-          def define_fields
+          def define_mongoid_field
             ensure_field_not_defined!(prefixed_name, klass)
             klass.class_eval <<-CALLBACK, __FILE__, __LINE__ + 1
               field :#{prefixed_name}, :type => Array, :default => []
             CALLBACK
-
-            define_fields_method
           end
         end
       end

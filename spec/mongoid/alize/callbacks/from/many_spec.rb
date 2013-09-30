@@ -13,16 +13,16 @@ describe Mongoid::Alize::Callbacks::From::Many do
     klass.new(*args)
   end
 
-  describe "#define_fields" do
+  describe "#define_mongoid_field" do
     it "should define an Array called {relation}_fields" do
       callback = new_callback
-      callback.send(:define_fields)
+      callback.send(:define_mongoid_field)
       Head.fields["wanted_by_fields"].type.should == Array
     end
 
     it "should default the field to empty" do
       callback = new_callback
-      callback.send(:define_fields)
+      callback.send(:define_mongoid_field)
       Head.new.wanted_by_fields.should == []
     end
 
@@ -32,7 +32,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
       end
       callback = new_callback
       expect {
-        callback.send(:define_fields)
+        callback.send(:define_mongoid_field)
       }.to raise_error(Mongoid::Alize::Errors::AlreadyDefinedField,
                        "wanted_by_fields is already defined on the Head model.")
     end
@@ -62,7 +62,8 @@ describe Mongoid::Alize::Callbacks::From::Many do
     describe "valid fields" do
       before do
         @callback = new_callback
-        @callback.send(:define_fields)
+        @callback.send(:define_mongoid_field)
+        @callback.send(:define_denorm_attrs)
         @callback.send(:define_callback)
       end
 
@@ -83,7 +84,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
     describe "with a field that doesn't exist" do
       before do
         @callback = klass.new(Head, :wanted_by, [:notreal])
-        @callback.send(:define_fields)
+        @callback.send(:define_mongoid_field)
         @callback.send(:define_callback)
       end
 
@@ -109,7 +110,8 @@ describe Mongoid::Alize::Callbacks::From::Many do
       @person = Person.create(:name => "Bob")
 
       @callback = klass.new(Head, :sees, [:name])
-      @callback.send(:define_fields)
+      @callback.send(:define_mongoid_field)
+      @callback.send(:define_denorm_attrs)
       @callback.send(:define_callback)
 
       @head.relations["sees"].should_not be_stores_foreign_key
