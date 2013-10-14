@@ -11,11 +11,11 @@ end
 Mongoid.configure do |config|
   if three?
     config.connect_to("mongoid_alize_test")
-    Moped.logger = Logger.new("log/test.log")
-    Moped.logger.level = Logger::DEBUG
+    Moped.logger = Logger.new($stdout)
+    Moped.logger.level = Logger::INFO
   else
     config.master = Mongo::Connection.new("localhost", 27017,
-                    :logger => Logger.new("log/test.log")).db("mongoid_alize_test")
+                    :logger => Logger.new($stdout)).db("mongoid_alize_test")
   end
 end
 
