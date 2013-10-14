@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 group :development, :test do
+  gem 'rake'
   gem 'mongoid', '~> 2.4'
   gem 'bson_ext'
 
