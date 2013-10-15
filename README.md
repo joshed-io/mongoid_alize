@@ -115,6 +115,9 @@ Check out [spec/mongoid_alize_spec.rb](https://github.com/dzello/mongoid_alize/b
 
 Changelog
 ---------
+### Release 0.4.2
+Several issues and pull requests fixed. Thanks [johnnyshields](https://github.com/johnnyshields)!
+
 ### Release 0.4.0
 Now supporting Mongoid 3.
 
