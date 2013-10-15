@@ -1,3 +1,4 @@
 log/*
 *.gem
 Gemfile.lock
+Gemfile.mongoid-two.lock
