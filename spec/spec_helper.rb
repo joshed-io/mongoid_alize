@@ -1,8 +1,11 @@
 require 'rubygems'
-require 'looksee'
-require 'awesome_print'
-require 'wirble'
 require 'mongoid'
+
+unless ENV['CI']
+  require 'looksee'
+  require 'awesome_print'
+  require 'wirble'
+end
 
 module SpecHelper
   def self.mongoid_3?
