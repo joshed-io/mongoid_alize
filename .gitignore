@@ -4,3 +4,4 @@ Gemfile.lock
 Gemfile.mongoid-two.lock
 bin
 .bundle
+tmp
