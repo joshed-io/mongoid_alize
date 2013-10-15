@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Mongoid::Alize::ToCallback do
 
   before do
-    @now = Time.parse('2013-01-05 23:41:22')
+    @now = Time.parse('2013-01-05T12:00:22-700')
     stub(Time).now { @now }
 
     Head.class_eval do
@@ -37,7 +37,7 @@ describe Mongoid::Alize::ToCallback do
   def sees_fields_mongoized
     fields = sees_fields_with_id.merge!( "created_at"  => @now.utc )
 
-    fields.merge!( "my_date"     => @now.utc.beginning_of_day,
+    fields.merge!( "my_date"     => @now.utc.to_date,
                    "my_datetime" => @now.utc ) if SpecHelper.mongoid_3?
 
     fields
