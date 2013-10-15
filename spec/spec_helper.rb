@@ -4,12 +4,14 @@ require 'awesome_print'
 require 'wirble'
 require 'mongoid'
 
-def three?
-  Mongoid::VERSION =~ /^3/
+module SpecHelper
+  def self.mongoid_3?
+    defined?(Mongoid::VERSION) && Mongoid::VERSION =~ /^3/
+  end
 end
 
 Mongoid.configure do |config|
-  if three?
+  if SpecHelper.mongoid_3?
     config.connect_to("mongoid_alize_test")
     Moped.logger = Logger.new($stdout)
     Moped.logger.level = Logger::INFO
