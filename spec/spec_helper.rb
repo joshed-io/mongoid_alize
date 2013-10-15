@@ -16,8 +16,10 @@ Mongoid.configure do |config|
     Moped.logger = Logger.new($stdout)
     Moped.logger.level = Logger::INFO
   else
+    logger = Logger.new($stdout)
+    logger.level = Logger::INFO
     config.master = Mongo::Connection.new("localhost", 27017,
-                    :logger => Logger.new($stdout)).db("mongoid_alize_test")
+                    :logger => logger).db("mongoid_alize_test")
   end
 end
 
@@ -27,6 +29,8 @@ Dir["#{File.dirname(__FILE__)}/helpers/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
   config.include(MacrosHelper)
+
+  puts "MongoidVersion - #{Mongoid::VERSION}"
 
   config.mock_with :rr
   config.before :each do
