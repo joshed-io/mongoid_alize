@@ -10,7 +10,9 @@ describe Mongoid::Alize::ToCallback do
       field :sees_fields, :type => Array, :default => []
     end
     Person.class_eval do
-      alize_to :seen_by, fields: [:name, :location, :created_at, :my_date, :my_datetime]
+      fields = [:name, :location, :created_at]
+      fields += [:my_date, :my_datetime] if SpecHelper.mongoid_3?
+      alize_to :seen_by, fields: fields
     end
 
     @head = Head.create(:sees => [@person = Person.create(sees_fields_without_id)])
@@ -18,12 +20,14 @@ describe Mongoid::Alize::ToCallback do
   end
 
   def sees_fields_without_id
-    { "name"=> "Bob",
-      "location" => "Paris",
-      "created_at"  => @now,
-      "my_date"     => @now.to_date,
-      "my_datetime" => @now.to_datetime
-    }
+    fields = { "name"=> "Bob",
+               "location" => "Paris",
+               "created_at" => @now }
+
+    fields.merge!( "my_date" => @now.to_date,
+                   "my_datetime" => @now.to_datetime ) if SpecHelper.mongoid_3?
+
+    fields
   end
 
   def sees_fields_with_id
@@ -31,10 +35,12 @@ describe Mongoid::Alize::ToCallback do
   end
 
   def sees_fields_mongoized
-    sees_fields_with_id.merge!(
-        "created_at"  => @now.utc,
-        "my_date"     => @now.utc.beginning_of_day,
-        "my_datetime" => @now.utc )
+    fields = sees_fields_with_id.merge!( "created_at"  => @now.utc )
+
+    fields.merge!( "my_date"     => @now.utc.beginning_of_day,
+                   "my_datetime" => @now.utc ) if SpecHelper.mongoid_3?
+
+    fields
   end
 
   it "should push the mongoized values to the relation" do

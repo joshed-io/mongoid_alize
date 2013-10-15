@@ -78,10 +78,11 @@ module Mongoid
       def field_values(source, options={})
         extras = options[:id] ? "['_id']" : "[]"
         <<-RUBY
-          (#{denorm_attrs_name}(#{source}) + #{extras}).inject({}) { |hash, name|
+          value = (#{denorm_attrs_name}(#{source}) + #{extras}).inject({}) do |hash, name|
             hash[name] = #{source}.send(name)
             hash
-          }.mongoize
+          end
+          value.respond_to?(:mongoize) ? value.mongoize : value
         RUBY
       end
 
