@@ -68,7 +68,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
       end
 
       it "should set fields from a changed relation" do
-        @head.wanted_by_ids << @person.id
+        @head.wanted_by_ids = [@person.id]
         @head.should be_wanted_by_ids_changed
         run_callback
         @head.wanted_by_fields.should == [bob_fields]
@@ -89,7 +89,7 @@ describe Mongoid::Alize::Callbacks::From::Many do
       end
 
       it "should raise a no method error" do
-        @head.wanted_by_ids << @person.id
+        @head.wanted_by_ids = [@person.id]
         @head.wanted_by_fields.should be_nil
         expect {
           run_callback
