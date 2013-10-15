@@ -4,8 +4,11 @@ class Person
 
   field :name, type: String
   field :created_at, type: Time
-  field :my_date, type: Date
-  field :my_datetime, type: DateTime
+
+  if SpecHelper.mongoid_3?
+    field :my_date, type: Date
+    field :my_datetime, type: DateTime
+  end
 
   # the attached head
   has_one :head
