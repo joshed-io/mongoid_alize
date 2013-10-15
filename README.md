@@ -8,8 +8,7 @@ Mongoid::Alize
 
 > Everything *and* the kitchen sync...
 
-Mongoid Alizé helps you improve your Mongoid application's
-read performance by making it easy to store related data together.
+Mongoid Alizé helps you improve your Mongoid application's read performance by making it easy to store related data together.
 
 Features of Mongoid Alizé
 -------------------------
