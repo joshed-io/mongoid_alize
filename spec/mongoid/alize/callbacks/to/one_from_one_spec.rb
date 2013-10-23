@@ -189,6 +189,7 @@ describe Mongoid::Alize::ToCallback do
       end
 
       it "should do nothing if the relation doesn't exist" do
+        @person.reload
         @person.nearest_head = nil
         run_destroy_callback
       end
