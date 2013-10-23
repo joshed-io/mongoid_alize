@@ -31,7 +31,7 @@ module Mongoid
 
               prefixed_name = #{prefixed_name}
               if is_one
-                relation.set(prefixed_name, field_values)
+                #{relation_set('prefixed_name', 'field_values')}
               else
                 #{pull_from_inverse}
                 relation.push(prefixed_name, field_values)
@@ -56,7 +56,7 @@ module Mongoid
               is_one = #{is_one?}
               prefixed_name = #{prefixed_name}
               if is_one
-                relation.set(prefixed_name, nil)
+                #{relation_set('prefixed_name', 'nil')}
               else
                 #{pull_from_inverse}
               end
@@ -88,6 +88,10 @@ module Mongoid
             (#{find_relation}.name.to_s + '_fields')
           RUBIES
         end
+      end
+
+      def relation_set(field, value)
+        mongoid4? ? "relation.set(#{field} => #{value})" : "relation.set(#{field}, #{value})"
       end
 
       def is_one?
@@ -141,6 +145,10 @@ module Mongoid
 
       def direction
         "to"
+      end
+
+      def mongoid4?
+        Mongoid::VERSION =~ /^4\./
       end
     end
   end
