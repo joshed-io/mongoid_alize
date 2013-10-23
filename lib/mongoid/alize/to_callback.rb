@@ -34,7 +34,7 @@ module Mongoid
                 #{relation_set('prefixed_name', 'field_values')}
               else
                 #{pull_from_inverse}
-                relation.push(prefixed_name, field_values)
+                #{relation_push('prefixed_name', 'field_values')}
               end
 
             end
@@ -71,7 +71,7 @@ module Mongoid
 
       def pull_from_inverse
         <<-RUBIES
-          relation.pull(prefixed_name, { "_id" => self.id })
+          #{relation_pull('prefixed_name', '{ "_id" => self.id }')}
           if _f = relation.send(prefixed_name)
             _f.reject! do |hash|
               hash["_id"] == self.id
@@ -91,7 +91,15 @@ module Mongoid
       end
 
       def relation_set(field, value)
-        mongoid4? ? "relation.set(#{field} => #{value})" : "relation.set(#{field}, #{value})"
+        mongoid_4? ? "relation.set(#{field} => #{value})" : "relation.set(#{field}, #{value})"
+      end
+
+      def relation_pull(field, value)
+        mongoid_4? ? "relation.pull(#{field} => #{value})" : "relation.pull(#{field}, #{value})"
+      end
+
+      def relation_push(field, value)
+        mongoid_4? ? "relation.push(#{field} => #{value})" : "relation.push(#{field}, #{value})"
       end
 
       def is_one?
@@ -147,7 +155,7 @@ module Mongoid
         "to"
       end
 
-      def mongoid4?
+      def mongoid_4?
         Mongoid::VERSION =~ /^4\./
       end
     end
