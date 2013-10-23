@@ -2,6 +2,10 @@ class Head
   include Mongoid::Document
   include Mongoid::Alize
 
+  if SpecHelper.mongoid_4?
+    include Mongoid::Attributes::Dynamic
+  end
+
   field :size, type: Integer
   field :weight
 

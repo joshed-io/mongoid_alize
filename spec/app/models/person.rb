@@ -2,10 +2,14 @@ class Person
   include Mongoid::Document
   include Mongoid::Alize
 
+  if SpecHelper.mongoid_4?
+    include Mongoid::Attributes::Dynamic
+  end
+
   field :name, type: String
   field :created_at, type: Time
 
-  if SpecHelper.mongoid_3?
+  if SpecHelper.mongoid_3? || SpecHelper.mongoid_4?
     field :my_date, type: Date
     field :my_datetime, type: DateTime
   end
