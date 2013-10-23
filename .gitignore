@@ -2,6 +2,7 @@ log/*
 *.gem
 Gemfile.lock
 Gemfile.mongoid-two.lock
+Gemfile.mongoid-four.lock
 bin
 .bundle
 tmp
