@@ -20,7 +20,7 @@ Features of Mongoid Alizé
 - Custom callbacks and exposed metadata provide flexibility and extensibility (e.g. asynchronous denormalization)
 - Comprehensive test suite with dozens of examples
 - The [wiki](https://github.com/dzello/mongoid_alize/wiki), soon to be full of war stories and protips.
-- Supports mongoid 3+ and mongoid 2.4+
+- Supports mongoid 4+ (experimental), mongoid 3+ and mongoid 2.4+
 
 Installation
 ------------
