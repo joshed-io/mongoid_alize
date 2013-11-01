@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/dzello/mongoid_alize"
   s.summary     = "Comprehensive field denormalization for Mongoid that stays in sync."
   s.description = "Keep data in sync as you denormalize across any type of relation."
+  s.license     = "MIT"
 
   s.files        = Dir["{config,lib,spec}/**/*"] - ["Gemfile.lock"]
   s.require_path = "lib"
