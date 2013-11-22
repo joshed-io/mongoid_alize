@@ -80,7 +80,7 @@ end
 @user.posts << Post.create!(:title => "Building a new bike", :category => "Cycling")
 @user.posts << Post.create!(:title => "Bay Area Kayaking", :category => "Kayaking")
 @user.posts_fields #=> [{ "title" => "Building a new bike", :category => "Cycling" },
-                        { "title" => "Bay Area Kayaking", :category => "Kayaking" }]
+                   #    { "title" => "Bay Area Kayaking", :category => "Kayaking" }]
 ```
 
 One-to-one, many-to-one, one-to-many, and many-to-many referenced relations are all supported.
