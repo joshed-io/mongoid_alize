@@ -26,57 +26,62 @@ Installation
 ------------
 Add the gem to your `Gemfile`:
 
-    gem 'mongoid_alize'
+``` ruby
+gem 'mongoid_alize'
+```
 
 Or install with RubyGems:
 
-    $ gem install mongoid_alize
+``` shell
+$ gem install mongoid_alize
+```
 
 Usage
 -----
 Here's a simple use case. A `Post` model would like to denormalize some data about its author - the `User`.
 
-    class Post
-      include Mongoid::Document
-      include Mongoid::Alize
+``` ruby
+class Post
+  include Mongoid::Document
+  include Mongoid::Alize
+  field :title
+  field :category
+  has_one :user
+  
+  # ***
+  alize :user, :name, :city # denormalize name and city from user
+  # ***
+  
+end
 
-      field :title
-      field :category
-
-      has_one :user
-
-      # ***
-      alize :user, :name, :city # denormalize name and city from user
-      # ***
-
-    end
-
-    # User data now saves into the Post record
-    @post.user = User.create!(:name => "Josh", :city => "San Francisco")
-    @post.user_fields["name"] #=> "Josh"
-    @post.user_fields["city"] #=> "San Francisco"
+# User data now saves into the Post record
+@post.user = User.create!(:name => "Josh", :city => "San Francisco")
+@post.user_fields["name"] #=> "Josh"
+@post.user_fields["city"] #=> "San Francisco"
+```
 
 Here's another case - where we'd like to store Post data into the User record. Note there are 'many' posts.
 
-    class User
-      include Mongoid::Document
-      include Mongoid::Alize
+``` ruby
+class User
+  include Mongoid::Document
+  include Mongoid::Alize
+  field :name
+  field :city
+  has_many :posts
+  
+  # ***
+  alize :posts # denormalize all fields from posts (the default w/ no fields specified)
+  # ***
+  
+end
 
-      field :name
-      field :city
-
-      has_many :posts
-
-      # ***
-      alize :posts # denormalize all fields from posts (the default w/ no fields specified)
-      # ***
-    end
-
-    # Post data now saves into the User record
-    @user.posts << Post.create!(:title => "Building a new bike", :category => "Cycling")
-    @user.posts << Post.create!(:title => "Bay Area Kayaking", :category => "Kayaking")
-    @user.posts_fields #=> [{ "title" => "Building a new bike", :category => "Cycling" },
-                            { "title" => "Bay Area Kayaking", :category => "Kayaking" }]
+# Post data now saves into the User record
+@user.posts << Post.create!(:title => "Building a new bike", :category => "Cycling")
+@user.posts << Post.create!(:title => "Bay Area Kayaking", :category => "Kayaking")
+@user.posts_fields #=> [{ "title" => "Building a new bike", :category => "Cycling" },
+                        { "title" => "Bay Area Kayaking", :category => "Kayaking" }]
+```
 
 One-to-one, many-to-one, one-to-many, and many-to-many referenced relations are all supported.
 
@@ -87,12 +92,26 @@ Migration / First-time installation
 -----------------------------------
 Once you've added your alize configuration you'll need to populate your new fields with data. Here's what a typical migration looks like for one model:
 
-    User.all.each do |user|
-      user.force_denormalization = true
-      user.save!
-    end
+``` ruby
+User.all.each do |user|
+  user.force_denormalization = true
+  user.save!
+end
+```
 
 Assuming User is the model w/ denormalized relations, this will iterate over your users and cause alize to denormalize data from the relations you have specified. Because the user's relations have not "changed" (in the ActiveModel attributes sense) the `force_denormalization` flag is needed.
+
+### Migrating from mongoid_denormalize
+
+Here's a simple example on how to migrate from another denormalization framework. This code moves the `user_name` field
+to `user_fields[name]`.
+
+``` ruby
+for post in posts
+  post.set(:user_fields, :name => post["user_name"])
+  post.unset(:user_name)
+end
+```
 
 Advanced Usage
 --------------
@@ -100,10 +119,12 @@ Callbacks are created as instance methods on the model (in the first example abo
 
 This is ideal for say, doing denormalization in the background. The traditional Delayed::Jobs-like approach would be this:
 
-    def denormalize_from_user
-      _denormalize_from_user
-    end
-    handle_asynchronously :denormalize_from_user
+``` ruby
+def denormalize_from_user
+  _denormalize_from_user
+end
+handle_asynchronously :denormalize_from_user
+```
 
 (Note: This extra business is needed because it's not always predictable when denormalize methods get defined by a class since callback method definitions can be defined from the inverse side.)
 
@@ -137,29 +158,33 @@ One is the natural limitation of the `alize` macro when it comes to polymorphic 
 
 The second challenge is that the fields to denormalize will likely be different on per-inverse basis. Perhaps your `:addressable` relation can store both homes and offices but needs to store different fields for each (e.g. offices have a company name, and homes belong to owners). This can be accomplished by passing a proc to the `:fields` option key when defining the relation. The block will be passed the model instance in question:
 
-    alize :addressable, :fields => lambda { |addressable|
-      if addressable.is_a?(Home)
-        [:owner_name]
-      elsif addressable.is_a?(Office)
-        [:company_name]
-      end
-    }
+``` ruby
+alize :addressable, :fields => lambda { |addressable|
+  if addressable.is_a?(Home)
+    [:owner_name]
+  elsif addressable.is_a?(Office)
+    [:company_name]
+  end
+}
+```
 
 Protip - In practice, rather than doing ugly type checking, I implement a method on any class that can be addressable that returns a list of fields:
 
-    class Home
-      def alize_fields_for_addressable
-        [:owner_name]
-      end
-    end
+``` ruby
+class Home
+  def alize_fields_for_addressable
+    [:owner_name]
+  end
+end
 
-    class Office
-      def alize_fields_for_addressable
-        [:company_name]
-      end
-    end
+class Office
+  def alize_fields_for_addressable
+    [:company_name]
+  end
+end
 
-    alize :addressable, :fields => lambda { |addressable| addressable.alize_fields_for_addressable }
+alize :addressable, :fields => lambda { |addressable| addressable.alize_fields_for_addressable }
+```
 
 Note the fields option is valid for anything you alize.
 
@@ -193,8 +218,10 @@ Tests / Contributing
 -------------
 The Gemfile has all you need to run the tests (w/ some extras like Guard and debugger). To run the specs:
 
-    bundle install
-    bundle exec rspec
+``` shell
+bundle install
+bundle exec rspec
+```
 
 Contributions and bug reports are welcome.
 
