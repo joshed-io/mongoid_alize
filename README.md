@@ -113,6 +113,12 @@ for post in posts
 end
 ```
 
+There's one caveat: If you happened to denormalize an `ObjectId` from another object as a String, you need to convert it to the correct type during the migration. (Thanks [@krismartin](https://github.com/krismartin)!)
+
+``` ruby
+object.set(:post_fields, :user_id => Moped::BSON::ObjectId(post["user_id"]))
+```
+
 Advanced Usage
 --------------
 Callbacks are created as instance methods on the model (in the first example above, these would be `denormalize_from_user` on `Post` and `denormalize_to_posts` on `User`. You can override these to extend behavior. To call the original from your override, simply append a `_` to the front of the method name, so `denormalize_from_user` becomes `_denormalize_from_user`.
