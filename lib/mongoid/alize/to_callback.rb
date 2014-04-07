@@ -155,9 +155,10 @@ module Mongoid
         "to"
       end
 
-      def mongoid_4?
-        Mongoid::VERSION =~ /^4\./
-      end
+	    def mongoid_4?
+			  version_arry = Mongoid::VERSION.split('.').map{|s|s.to_i}
+			  version_arry[0] >= 4 ? true : false
+	    end
     end
   end
 end
