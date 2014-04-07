@@ -154,11 +154,9 @@ module Mongoid
       def direction
         "to"
       end
-
-	    def mongoid_4?
-			  version_arry = Mongoid::VERSION.split('.').map{|s|s.to_i}
-			  version_arry[0] >= 4 ? true : false
-	    end
+      def mongoid_4?
+	!(Mongoid::VERSION =~ /^4\./).nil?
+      end
     end
   end
 end
