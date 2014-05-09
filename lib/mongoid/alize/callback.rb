@@ -62,7 +62,7 @@ module Mongoid
         _denorm_attrs = denorm_attrs
         if denorm_attrs.is_a?(Proc)
           klass.send(:define_method, denorm_attrs_name) do |inverse|
-            _denorm_attrs.bind(self).call(inverse).map(&:to_s)
+            self.instance_exec(inverse, &_denorm_attrs).map(&:to_s)
           end
         else
           klass.send(:define_method, denorm_attrs_name) do |inverse|
