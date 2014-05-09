@@ -17,8 +17,6 @@ group :development, :test do
     # irb goodies
     gem 'awesome_print'
     gem 'wirble'
-    gem 'looksee'
-    gem 'debugger'
   end
 end
 

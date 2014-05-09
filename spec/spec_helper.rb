@@ -2,7 +2,6 @@ require 'rubygems'
 require 'mongoid'
 
 unless ENV['CI']
-  require 'looksee'
   require 'awesome_print'
   require 'wirble'
 end
