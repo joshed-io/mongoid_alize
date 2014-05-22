@@ -154,9 +154,8 @@ module Mongoid
       def direction
         "to"
       end
-
       def mongoid_4?
-        Mongoid::VERSION =~ /^4\./
+	!(Mongoid::VERSION =~ /^4\./).nil?
       end
     end
   end
