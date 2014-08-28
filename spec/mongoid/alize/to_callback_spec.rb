@@ -69,7 +69,7 @@ describe Mongoid::Alize::ToCallback do
 
   describe "#set_destroy_callback" do
     it "should set a destroy callback on the klass" do
-      mock(@callback.klass).set_callback(:destroy, :after, "denormalize_destroy_to_head")
+      mock(@callback.klass).set_callback(:destroy, :before, "denormalize_destroy_to_head")
       @callback.send(:set_destroy_callback)
     end
 
