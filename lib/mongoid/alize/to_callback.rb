@@ -156,7 +156,7 @@ module Mongoid
       end
 
       def mongoid_4?
-        Mongoid::VERSION =~ /^4\./
+        Mongoid::VERSION.split('.').first.to_i>=4
       end
     end
   end
