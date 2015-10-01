@@ -14,13 +14,19 @@ module SpecHelper
   def self.mongoid_4?
     defined?(Mongoid::VERSION) && Mongoid::VERSION =~ /^4/
   end
+
+  def self.mongoid_5?
+    defined?(Mongoid::VERSION) && Mongoid::VERSION =~ /^5/
+  end
 end
 
 Mongoid.configure do |config|
-  if SpecHelper.mongoid_3? || SpecHelper.mongoid_4?
+  if SpecHelper.mongoid_3? || SpecHelper.mongoid_4? || SpecHelper.mongoid_5?
     config.connect_to("mongoid_alize_test")
-    Moped.logger = Logger.new($stdout)
-    Moped.logger.level = Logger::INFO
+  elsif SpecHelper.mongoid_5?
+    config.connect_to("mongoid_alize_test")
+    Mongo.logger = Logger.new($stdout)
+    Mongo.logger.level = Logger::INFO
   else
     logger = Logger.new($stdout)
     logger.level = Logger::INFO
