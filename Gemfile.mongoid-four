@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 group :development, :test do
   gem 'rake'
-  gem 'mongoid', github: 'mongoid/mongoid'
+  gem 'mongoid', '~> 4'
   gem 'bson_ext'
 
   gem 'rspec'
