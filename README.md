@@ -22,6 +22,10 @@ Features of Mongoid Alizé
 - The [wiki](https://github.com/dzello/mongoid_alize/wiki), soon to be full of war stories and protips.
 - Supports mongoid 4+ (experimental), mongoid 3+ and mongoid 2.4+
 
+Compatibility
+-------------
+Mongoid Alizé supports Mongoid versions 2, 3, 4, and now 5.
+
 Installation
 ------------
 Add the gem to your `Gemfile`:
@@ -142,6 +146,9 @@ Check out [spec/mongoid_alize_spec.rb](https://github.com/dzello/mongoid_alize/b
 
 Changelog
 ---------
+### Release 0.5.0
+Now supporting Mongoid 5.
+
 ### Release 0.4.2
 Several issues and pull requests fixed. Thanks [johnnyshields](https://github.com/johnnyshields)!
 
