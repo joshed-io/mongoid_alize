@@ -7,23 +7,37 @@ unless ENV['CI']
 end
 
 module SpecHelper
+
+  # for mongoize_spec
   def self.mongoid_3?
-    defined?(Mongoid::VERSION) && Mongoid::VERSION =~ /^3/
+    defined?(Mongoid::VERSION) && Mongoid::VERSION.split('.').first.to_i == 3
   end
 
-  def self.mongoid_4?
-    defined?(Mongoid::VERSION) && Mongoid::VERSION =~ /^4/
+  # different connection scheme starting with three
+  def self.mongoid_three_or_newer?
+    defined?(Mongoid::VERSION) && Mongoid::VERSION.split('.').first.to_i >= 3
   end
+
+  # dynamic attributes required starting with four
+  def self.mongoid_four_or_newer?
+    defined?(Mongoid::VERSION) && Mongoid::VERSION.split('.').first.to_i >= 4
+  end
+
 end
 
 Mongoid.configure do |config|
-  if SpecHelper.mongoid_3? || SpecHelper.mongoid_4?
-    config.connect_to("mongoid_alize_test")
+
+  if defined?(Moped)
     Moped.logger = Logger.new($stdout)
     Moped.logger.level = Logger::INFO
   else
     logger = Logger.new($stdout)
     logger.level = Logger::INFO
+  end
+
+  if SpecHelper.mongoid_three_or_newer?
+    config.connect_to("mongoid_alize_test")
+  else
     config.master = Mongo::Connection.new("localhost", 27017,
                     :logger => logger).db("mongoid_alize_test")
   end

@@ -91,15 +91,15 @@ module Mongoid
       end
 
       def relation_set(field, value)
-        mongoid_4? ? "relation.set(#{field} => #{value})" : "relation.set(#{field}, #{value})"
+        mongoid_four_or_newer? ? "relation.set(#{field} => #{value})" : "relation.set(#{field}, #{value})"
       end
 
       def relation_pull(field, value)
-        mongoid_4? ? "relation.pull(#{field} => #{value})" : "relation.pull(#{field}, #{value})"
+        mongoid_four_or_newer? ? "relation.pull(#{field} => #{value})" : "relation.pull(#{field}, #{value})"
       end
 
       def relation_push(field, value)
-        mongoid_4? ? "relation.push(#{field} => #{value})" : "relation.push(#{field}, #{value})"
+        mongoid_four_or_newer? ? "relation.push(#{field} => #{value})" : "relation.push(#{field}, #{value})"
       end
 
       def is_one?
@@ -155,9 +155,10 @@ module Mongoid
         "to"
       end
 
-      def mongoid_4?
-        Mongoid::VERSION =~ /^4\./
+      def mongoid_four_or_newer?
+        Mongoid::VERSION.split('.').first.to_i >= 4
       end
+
     end
   end
 end

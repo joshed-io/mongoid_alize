@@ -2,7 +2,7 @@ class Head
   include Mongoid::Document
   include Mongoid::Alize
 
-  if SpecHelper.mongoid_4?
+  if SpecHelper.mongoid_four_or_newer?
     include Mongoid::Attributes::Dynamic
   end
 
