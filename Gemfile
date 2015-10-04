@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 group :development, :test do
   gem 'rake'
-  gem 'mongoid', '>= 3'
+  gem 'mongoid', '~> 3'
 
   gem 'rspec'
   gem 'rr'
