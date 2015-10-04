@@ -6,6 +6,7 @@ rvm:
 gemfile:
   - Gemfile
   - Gemfile.mongoid-two
+  - Gemfile.mongoid-three
   - Gemfile.mongoid-four
 matrix:
   exclude:
