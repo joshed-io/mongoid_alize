@@ -3,6 +3,7 @@ services: mongodb
 rvm:
   - 2.0.0
   - 1.9.3
+  - jruby
 gemfile:
   - Gemfile
   - Gemfile.mongoid-two
