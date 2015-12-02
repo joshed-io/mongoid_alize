@@ -132,7 +132,11 @@ module Mongoid
 
       def set_destroy_callback
         unless callback_attached?("destroy", aliased_destroy_callback_name)
-          klass.set_callback(:destroy, :after, aliased_destroy_callback_name)
+          if self.metadata.dependent == :restrict
+            klass.set_callback(:destroy, :after, aliased_destroy_callback_name)
+          else
+            klass.set_callback(:destroy, :before, aliased_destroy_callback_name)
+          end
         end
       end
 
