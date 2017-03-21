@@ -6,7 +6,7 @@ Mongoid::Alize
 
 **Comprehensive, flexible denormalization for Mongoid that stays in sync**
 
-> Everything *and* the kitchen sync...
+> Everything *and* the kitchen sink...
 
 Mongoid Alizé helps you improve your Mongoid application's read performance by making it easy to store related data together.
 
