@@ -51,8 +51,6 @@ describe Mongoid::Alize::Callbacks::From::Many do
     end
 
     before do
-      now = Time.now
-      stub(Time).now { now }
       @head = Head.create
       @person = Person.create(:name => "Bob")
 
@@ -103,8 +101,6 @@ describe Mongoid::Alize::Callbacks::From::Many do
     end
 
     before do
-      now = Time.now
-      stub(Time).now { now }
       @head = Head.create
       @person = Person.create(:name => "Bob")
 

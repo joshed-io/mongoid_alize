@@ -4,7 +4,6 @@ describe Mongoid::Alize::ToCallback do
 
   before do
     @now = Time.parse('2013-01-05T12:00:22-700')
-    stub(Time).now { @now }
 
     Head.class_eval do
       field :sees_fields, :type => Array, :default => []
