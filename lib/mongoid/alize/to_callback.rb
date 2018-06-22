@@ -58,7 +58,7 @@ module Mongoid
               is_one = #{is_one?}
               prefixed_name = #{prefixed_name}
               if is_one
-                #{relation_set('prefixed_name', 'nil')}
+                #{relation_unset('prefixed_name')}
               else
                 #{pull_from_inverse}
               end
@@ -94,6 +94,10 @@ module Mongoid
 
       def relation_set(field, value)
         Mongoid::Compatibility::Version.mongoid4_or_newer? ? "relation.set(#{field}.to_sym => #{value})" : "relation.set(#{field}, #{value})"
+      end
+
+      def relation_unset(field)
+        "relation.unset(#{field}.to_sym)"
       end
 
       def relation_pull(field, value)
