@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'mongoid'
 require 'mongoid/compatibility'
+require 'rr'
 
 unless ENV['CI']
   require 'awesome_print'
