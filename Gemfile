@@ -11,7 +11,7 @@ gem "mongoid-compatibility"
 group :development, :test do
   gem 'rake'
 
-  gem 'rspec', '2.6.0'
+  gem 'rspec', '~> 2.6.0'
   gem 'rr', '1.2.1'
 
   unless ENV['CI']
