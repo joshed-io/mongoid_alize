@@ -9,7 +9,7 @@ class Person
   field :name, type: String
   field :created_at, type: Time
 
-  if Mongoid::Compatibility::Version.mongoid3_or_newer?
+  if Mongoid::Compatibility::Version.mongoid4_or_newer?
     field :my_date, type: Date
     field :my_datetime, type: DateTime
   end
