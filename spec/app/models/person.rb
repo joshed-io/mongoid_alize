@@ -23,7 +23,7 @@ class Person
   # the heads wanted from others
   has_and_belongs_to_many :wants, :class_name => "Head", :inverse_of => :wanted_by
 
-  if Mongoid::Compatibility::Version.mongoid5_or_newer?
+  if Mongoid::Compatibility::Version.mongoid6_or_newer?
     # the only head that is watching
     belongs_to :seen_by, :class_name => "Head", :inverse_of => :sees, optional: true
   else
@@ -34,7 +34,7 @@ class Person
   # a polymorphic one-to-one relation
   has_one :nearest_head, :class_name => "Head", :as => :nearest
 
-  if Mongoid::Compatibility::Version.mongoid5_or_newer?
+  if Mongoid::Compatibility::Version.mongoid6_or_newer?
     # a polymorphic one-to-many relation
     belongs_to :above, :polymorphic => true, optional: true
   else

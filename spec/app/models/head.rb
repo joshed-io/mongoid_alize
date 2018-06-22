@@ -9,7 +9,7 @@ class Head
   field :size, type: Integer
   field :weight
 
-  if Mongoid::Compatibility::Version.mongoid5_or_newer?
+  if Mongoid::Compatibility::Version.mongoid6_or_newer?
     # to whom it's attached
     belongs_to :person, optional: true
 
@@ -32,7 +32,7 @@ class Head
   # a relation with no inverse
   has_many :admirer, :class_name => "Person", :inverse_of => nil
 
-  if Mongoid::Compatibility::Version.mongoid5_or_newer?
+  if Mongoid::Compatibility::Version.mongoid6_or_newer?
     # a polymorphic one-to-one relation
     belongs_to :nearest, :polymorphic => true, optional: true
   else
