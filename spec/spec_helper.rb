@@ -18,12 +18,8 @@ Mongoid.configure do |config|
     logger.level = Logger::INFO
   end
 
-  if Mongoid::Compatibility::Version.mongoid3_or_newer?
-    config.connect_to("mongoid_alize_test")
-  else
-    config.master = Mongo::Connection.new("localhost", 27017,
-                    :logger => logger).db("mongoid_alize_test")
-  end
+  name = "mongoid_alize_test"
+  config.respond_to?(:connect_to) ? config.connect_to(name) : config.master = Mongo::Connection.new.db(name)
 end
 
 require File.expand_path("../../lib/mongoid_alize", __FILE__)
