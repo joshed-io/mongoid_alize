@@ -26,11 +26,11 @@ describe Mongoid::Alize::ToCallback do
 
   describe "names" do
     it "should assign a destroy callback name" do
-      @callback.destroy_callback_name.should == "_denormalize_destroy_to_head"
+      @callback.destroy_callback_name.should == :_denormalize_destroy_to_head
     end
 
     it "should assign an aliased destroy callback name" do
-      @callback.aliased_destroy_callback_name.should == "denormalize_destroy_to_head"
+      @callback.aliased_destroy_callback_name.should == :denormalize_destroy_to_head
     end
 
     it "should assign a prefixed name from the inverse if present" do
@@ -56,7 +56,7 @@ describe Mongoid::Alize::ToCallback do
 
   describe "#set_callback" do
     it "should set a callback on the klass" do
-      mock(@callback.klass).set_callback(:save, :after, "denormalize_to_head")
+      mock(@callback.klass).set_callback(:save, :after, :denormalize_to_head)
       @callback.send(:set_callback)
     end
 
@@ -69,7 +69,7 @@ describe Mongoid::Alize::ToCallback do
 
   describe "#set_destroy_callback" do
     it "should set a destroy callback on the klass" do
-      mock(@callback.klass).set_callback(:destroy, :after, "denormalize_destroy_to_head")
+      mock(@callback.klass).set_callback(:destroy, :after, :denormalize_destroy_to_head)
       @callback.send(:set_destroy_callback)
     end
 
@@ -82,8 +82,8 @@ describe Mongoid::Alize::ToCallback do
 
   describe "#alias_destroy_callback" do
     it "should alias the destroy callback on the klass" do
-      mock(@callback.klass).alias_method("denormalize_destroy_to_head", "_denormalize_destroy_to_head")
-      mock(@callback.klass).public("denormalize_destroy_to_head")
+      mock(@callback.klass).alias_method(:denormalize_destroy_to_head, :_denormalize_destroy_to_head)
+      mock(@callback.klass).public(:denormalize_destroy_to_head)
       @callback.send(:alias_destroy_callback)
     end
 

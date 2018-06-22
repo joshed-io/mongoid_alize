@@ -150,11 +150,11 @@ module Mongoid
       end
 
       def aliased_destroy_callback_name
-        "denormalize_destroy_#{direction}_#{relation}"
+        :"denormalize_destroy_#{direction}_#{relation}"
       end
 
       def destroy_callback_name
-        "_#{aliased_destroy_callback_name}"
+        :"_#{aliased_destroy_callback_name}"
       end
 
       def direction

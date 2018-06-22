@@ -31,7 +31,7 @@ describe Mongoid::Alize::FromCallback do
 
   describe "#set_callback" do
     it "should set a callback on the klass" do
-      mock(@callback.klass).set_callback(:save, :before, "denormalize_from_person")
+      mock(@callback.klass).set_callback(:save, :before, :denormalize_from_person)
       @callback.send(:set_callback)
     end
 
