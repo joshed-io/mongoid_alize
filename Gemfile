@@ -24,6 +24,8 @@ else
   gem "mongoid", mongoid_version
 end
 
+gem "mongoid-compatibility"
+
 group :development, :test do
   gem 'rake'
 
