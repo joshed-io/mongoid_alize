@@ -11,7 +11,6 @@ describe Mongoid::Alize do
 
   before do
     @now = Time.now
-    stub(Time).now { @now }
     @head = Head.new(:size => @size = 10, created_at: @now)
     @person = Person.new(:name => @name = "Bob", created_at: @now)
   end

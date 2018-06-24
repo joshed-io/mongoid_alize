@@ -1,11 +1,18 @@
 source 'https://rubygems.org'
 
-group :development, :test do
-  gem 'rake'
-  gem 'mongoid', '~> 5'
+rails_version = ENV['RAILS_VERSION'] || "5.2"
+gem "rails", rails_version
 
-  gem 'rspec'
-  gem 'rr'
+mongoid_version = ENV['MONGOID_VERSION'] || "6.4"
+gem "mongoid", mongoid_version
+
+gem "mongoid-compatibility"
+
+group :development, :test do
+  gem 'rake', '~> 12.3.1'
+
+  gem 'rspec', '~> 2.99'
+  gem 'rr', '1.2.1'
 
   unless ENV['CI']
     gem 'guard'

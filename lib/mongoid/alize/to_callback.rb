@@ -1,3 +1,5 @@
+require 'mongoid/compatibility'
+
 module Mongoid
   module Alize
     class ToCallback < Callback
@@ -56,7 +58,7 @@ module Mongoid
               is_one = #{is_one?}
               prefixed_name = #{prefixed_name}
               if is_one
-                #{relation_set('prefixed_name', 'nil')}
+                #{relation_unset('prefixed_name')}
               else
                 #{pull_from_inverse}
               end
@@ -91,15 +93,19 @@ module Mongoid
       end
 
       def relation_set(field, value)
-        mongoid_four_or_newer? ? "relation.set(#{field} => #{value})" : "relation.set(#{field}, #{value})"
+        Mongoid::Compatibility::Version.mongoid4_or_newer? ? "relation.set(#{field}.to_sym => #{value})" : "relation.set(#{field}, #{value})"
+      end
+
+      def relation_unset(field)
+        "relation.unset(#{field}.to_sym)"
       end
 
       def relation_pull(field, value)
-        mongoid_four_or_newer? ? "relation.pull(#{field} => #{value})" : "relation.pull(#{field}, #{value})"
+        Mongoid::Compatibility::Version.mongoid4_or_newer? ? "relation.pull(#{field}.to_sym => #{value})" : "relation.pull(#{field}, #{value})"
       end
 
       def relation_push(field, value)
-        mongoid_four_or_newer? ? "relation.push(#{field} => #{value})" : "relation.push(#{field}, #{value})"
+        Mongoid::Compatibility::Version.mongoid4_or_newer? ? "relation.push(#{field}.to_sym => #{value})" : "relation.push(#{field}, #{value})"
       end
 
       def is_one?
@@ -144,19 +150,15 @@ module Mongoid
       end
 
       def aliased_destroy_callback_name
-        "denormalize_destroy_#{direction}_#{relation}"
+        :"denormalize_destroy_#{direction}_#{relation}"
       end
 
       def destroy_callback_name
-        "_#{aliased_destroy_callback_name}"
+        :"_#{aliased_destroy_callback_name}"
       end
 
       def direction
         "to"
-      end
-
-      def mongoid_four_or_newer?
-        Mongoid::VERSION.split('.').first.to_i >= 4
       end
 
     end

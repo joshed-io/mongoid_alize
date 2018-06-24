@@ -57,8 +57,8 @@ describe Mongoid::Alize::Callback do
 
     describe "#alias_callback" do
       it "should alias the callback on the klass and make it public" do
-        mock(@callback.klass).alias_method("denormalize_spec_person", "_denormalize_spec_person")
-        mock(@callback.klass).public("denormalize_spec_person")
+        mock(@callback.klass).alias_method(:denormalize_spec_person, :_denormalize_spec_person)
+        mock(@callback.klass).public(:denormalize_spec_person)
         @callback.send(:alias_callback)
       end
 
@@ -76,15 +76,15 @@ describe Mongoid::Alize::Callback do
     end
 
     it "should have a callback name" do
-      @callback.callback_name.should == "_denormalize_spec_person"
+      @callback.callback_name.should == :_denormalize_spec_person
     end
 
     it "should have aliased callback name" do
-      @callback.aliased_callback_name.should == "denormalize_spec_person"
+      @callback.aliased_callback_name.should == :denormalize_spec_person
     end
 
     it "should add _attrs to the callback name" do
-      @callback.denorm_attrs_name.should == "_denormalize_spec_person_attrs"
+      @callback.denorm_attrs_name.should == :_denormalize_spec_person_attrs
     end
   end
 
@@ -101,7 +101,7 @@ describe Mongoid::Alize::Callback do
       it "should return the denorm_attrs w/ to_s applied" do
         define_denorm_attrs
         @head = Head.new
-        @head.send("_denormalize_spec_person_attrs", nil).should == ["name", "created_at"]
+        @head.send(:_denormalize_spec_person_attrs, nil).should == ["name", "created_at"]
       end
     end
 
@@ -113,7 +113,7 @@ describe Mongoid::Alize::Callback do
       it "should return the denorm_attrs w/ to_s applied" do
         define_denorm_attrs
         @head = Head.new
-        @head.send("_denormalize_spec_person_attrs", Person.new).should == ["name", "created_at"]
+        @head.send(:_denormalize_spec_person_attrs, Person.new).should == ["name", "created_at"]
       end
     end
   end

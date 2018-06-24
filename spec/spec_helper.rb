@@ -1,28 +1,11 @@
 require 'rubygems'
 require 'mongoid'
+require 'mongoid/compatibility'
+require 'rr'
 
 unless ENV['CI']
   require 'awesome_print'
   require 'wirble'
-end
-
-module SpecHelper
-
-  # for mongoize_spec
-  def self.mongoid_3?
-    defined?(Mongoid::VERSION) && Mongoid::VERSION.split('.').first.to_i == 3
-  end
-
-  # different connection scheme starting with three
-  def self.mongoid_three_or_newer?
-    defined?(Mongoid::VERSION) && Mongoid::VERSION.split('.').first.to_i >= 3
-  end
-
-  # dynamic attributes required starting with four
-  def self.mongoid_four_or_newer?
-    defined?(Mongoid::VERSION) && Mongoid::VERSION.split('.').first.to_i >= 4
-  end
-
 end
 
 Mongoid.configure do |config|
@@ -35,12 +18,8 @@ Mongoid.configure do |config|
     logger.level = Logger::INFO
   end
 
-  if SpecHelper.mongoid_three_or_newer?
-    config.connect_to("mongoid_alize_test")
-  else
-    config.master = Mongo::Connection.new("localhost", 27017,
-                    :logger => logger).db("mongoid_alize_test")
-  end
+  name = "mongoid_alize_test"
+  config.respond_to?(:connect_to) ? config.connect_to(name) : config.master = Mongo::Connection.new.db(name)
 end
 
 require File.expand_path("../../lib/mongoid_alize", __FILE__)

@@ -1,15 +1,17 @@
 language: ruby
 services: mongodb
+script: "bundle exec rspec spec"
 rvm:
-  - 2.0.0
-  - 1.9.3
-  - jruby
+  - 2.5.1
+  - 2.3.7
 gemfile:
   - Gemfile
-  - Gemfile.mongoid-two
-  - Gemfile.mongoid-three
-  - Gemfile.mongoid-four
-matrix:
-  exclude:
-    - rvm: 1.9.2
-      gemfile: Gemfile
+env:
+  - RAILS_VERSION=3.2 MONGOID_VERSION=3.1
+  - RAILS_VERSION=4.2.10 MONGOID_VERSION=4.0
+  - RAILS_VERSION=4.2.10 MONGOID_VERSION=5.0
+  - RAILS_VERSION=5.0 MONGOID_VERSION=6.1
+  - RAILS_VERSION=5.1 MONGOID_VERSION=6.2
+  - RAILS_VERSION=5.2 MONGOID_VERSION=6.4
+services:
+  - mongodb

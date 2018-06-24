@@ -4,14 +4,13 @@ describe Mongoid::Alize::ToCallback do
 
   before do
     @now = Time.parse('2013-01-05T12:00:22-700')
-    stub(Time).now { @now }
 
     Head.class_eval do
       field :sees_fields, :type => Array, :default => []
     end
     Person.class_eval do
       fields = [:name, :location, :created_at]
-      fields += [:my_date, :my_datetime] if SpecHelper.mongoid_3?
+      fields += [:my_date, :my_datetime] if Mongoid::Compatibility::Version.mongoid4_or_newer?
       alize_to :seen_by, fields: fields
     end
 
@@ -25,7 +24,7 @@ describe Mongoid::Alize::ToCallback do
                "created_at" => @now }
 
     fields.merge!( "my_date" => @now.to_date,
-                   "my_datetime" => @now.to_datetime ) if SpecHelper.mongoid_3?
+                   "my_datetime" => @now.to_datetime ) if Mongoid::Compatibility::Version.mongoid4_or_newer?
 
     fields
   end
@@ -38,7 +37,7 @@ describe Mongoid::Alize::ToCallback do
     fields = sees_fields_with_id.merge!( "created_at"  => @now.utc )
 
     fields.merge!( "my_date"     => @now.utc.to_date,
-                   "my_datetime" => @now.utc ) if SpecHelper.mongoid_3?
+                   "my_datetime" => @now.utc ) if Mongoid::Compatibility::Version.mongoid4_or_newer?
 
     fields
   end

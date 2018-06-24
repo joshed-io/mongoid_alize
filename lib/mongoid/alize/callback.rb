@@ -51,11 +51,11 @@ module Mongoid
       end
 
       def callback_name
-        "_#{aliased_callback_name}"
+        :"_#{aliased_callback_name}"
       end
 
       def aliased_callback_name
-        "denormalize_#{direction}_#{relation}"
+        :"denormalize_#{direction}_#{relation}"
       end
 
       def define_denorm_attrs
@@ -72,7 +72,7 @@ module Mongoid
       end
 
       def denorm_attrs_name
-        "#{callback_name}_attrs"
+        :"#{callback_name}_attrs"
       end
 
       def field_values(source, options={})
