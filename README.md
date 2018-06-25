@@ -19,7 +19,6 @@ Features of Mongoid Alize
 - Supports polymorphic relations as of 0.3.0.
 - Custom callbacks and exposed metadata provide flexibility and extensibility (e.g. asynchronous denormalization)
 - Comprehensive test suite with dozens of examples
-- The [wiki](https://github.com/dzello/mongoid_alize/wiki), soon to be full of war stories and protips.
 
 Compatibility
 -------------
@@ -235,7 +234,7 @@ The Gemfile has all you need to run the tests (w/ some extras like Guard and deb
 
 ``` shell
 bundle install
-bundle exec rspec
+bundle exec rspec spec
 ```
 
 Contributions and bug reports are welcome.
