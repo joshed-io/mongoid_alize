@@ -9,8 +9,6 @@ gem "mongoid", mongoid_version
 gem "mongoid-compatibility"
 
 group :development, :test do
-  gem 'rake', '~> 12.3.1'
-
   gem 'rspec', '~> 2.99'
   gem 'rr', '1.2.1'
 
