@@ -8,9 +8,9 @@ Mongoid::Alize
 
 > Everything *and* the kitchen sync...
 
-Mongoid Alizé helps you improve your Mongoid application's read performance by making it easy to store related data together.
+Mongoid Alize helps you improve your Mongoid application's read performance by making it easy to store related data together.
 
-Features of Mongoid Alizé
+Features of Mongoid Alize
 -------------------------
 - Extremely light DSL and easy setup
 - Works with one-to-one, one-to-many, and many-to-many relations.
@@ -20,11 +20,10 @@ Features of Mongoid Alizé
 - Custom callbacks and exposed metadata provide flexibility and extensibility (e.g. asynchronous denormalization)
 - Comprehensive test suite with dozens of examples
 - The [wiki](https://github.com/dzello/mongoid_alize/wiki), soon to be full of war stories and protips.
-- Supports mongoid 4+ (experimental), mongoid 3+ and mongoid 2.4+
 
 Compatibility
 -------------
-Mongoid Alizé supports Mongoid versions 2, 3, 4, and now 5.
+As of June 2018, Mongoid Alize supports Mongoid up to version 6.4.
 
 Installation
 ------------
@@ -51,11 +50,11 @@ class Post
   field :title
   field :category
   has_one :user
-  
+
   # ***
   alize :user, :name, :city # denormalize name and city from user
   # ***
-  
+
 end
 
 # User data now saves into the Post record
@@ -73,11 +72,11 @@ class User
   field :name
   field :city
   has_many :posts
-  
+
   # ***
   alize :posts # denormalize all fields from posts (the default w/ no fields specified)
   # ***
-  
+
 end
 
 # Post data now saves into the User record
@@ -146,6 +145,9 @@ Check out [spec/mongoid_alize_spec.rb](https://github.com/dzello/mongoid_alize/b
 
 Changelog
 ---------
+### Release 0.6.0
+June 2018 - Now supporting up to Mongoid 6.4. Thanks to [@joe1chen](https://github.com/joe1chen) for the contribution that made this possible!
+
 ### Release 0.5.0
 Now supporting Mongoid 5.
 
