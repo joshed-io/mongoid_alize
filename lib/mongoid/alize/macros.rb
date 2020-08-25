@@ -76,12 +76,22 @@ module Mongoid
       end
 
       def _alize_relation_types
-        one  = Mongoid::Relations::One
-        many = Mongoid::Relations::Many
+        if Mongoid::Compatibility::Version.mongoid7_or_newer?
+          one  = Mongoid::Association::One
+          many = Mongoid::Association::Many
+        else
+          one  = Mongoid::Relations::One
+          many = Mongoid::Relations::Many
+        end
 
         def (many).==(klass)
-          [Mongoid::Relations::Many,
-           Mongoid::Relations::Referenced::Many].map(&:name).include?(klass.name)
+          if Mongoid::Compatibility::Version.mongoid7_or_newer?
+            [Mongoid::Association::Many,
+             Mongoid::Association::Referenced::HasMany::Proxy].map(&:name).include?(klass.name)
+          else
+            [Mongoid::Relations::Many,
+             Mongoid::Relations::Referenced::Many].map(&:name).include?(klass.name)
+          end
         end
 
         [one, many]

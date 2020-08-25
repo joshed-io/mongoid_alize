@@ -109,16 +109,30 @@ module Mongoid
       end
 
       def is_one?
-        if inverse_relation
-          if self.inverse_metadata.relation.superclass == Mongoid::Relations::One
-            "true"
+        if Mongoid::Compatibility::Version.mongoid7_or_newer?
+          if inverse_relation
+            if self.inverse_metadata.relation.superclass == Mongoid::Association::One
+              "true"
+            else
+              "false"
+            end
           else
-            "false"
+            <<-RUBIES
+            (#{find_relation}.relation.superclass == Mongoid::Association::One)
+            RUBIES
           end
         else
-          <<-RUBIES
+          if inverse_relation
+            if self.inverse_metadata.relation.superclass == Mongoid::Relations::One
+              "true"
+            else
+              "false"
+            end
+          else
+            <<-RUBIES
             (#{find_relation}.relation.superclass == Mongoid::Relations::One)
-          RUBIES
+            RUBIES
+          end
         end
       end
 
