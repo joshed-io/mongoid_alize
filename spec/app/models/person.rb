@@ -15,7 +15,11 @@ class Person
   end
 
   # the attached head
-  has_one :head
+  if Mongoid::Compatibility::Version.mongoid7_or_newer?
+    has_one :head, :inverse_of => :person
+  else
+    has_one :head
+  end
 
   # the heads taken from others
   has_many :heads, :class_name => "Head", :inverse_of => :captor
