@@ -26,6 +26,9 @@ require File.expand_path("../../lib/mongoid_alize", __FILE__)
 Dir["#{File.dirname(__FILE__)}/app/models/*.rb"].each { |f| require f }
 Dir["#{File.dirname(__FILE__)}/helpers/*.rb"].each { |f| require f }
 
+SAVED_FIELDS = {
+}
+
 RSpec.configure do |config|
   config.include(MacrosHelper)
 
@@ -35,21 +38,18 @@ RSpec.configure do |config|
   config.before :each do
     Mongoid.purge!
 
-    persistent_fields = {
-      Object => [:_id, :_type],
-      Person => [:name, :created_at, :want_ids, :seen_by_id],
-      Head => [:size, :weight, :person_id, :captor_id, :wanted_by_ids]
-    }
-
     [Head, Person].each do |klass|
+      if !SAVED_FIELDS[klass]
+        SAVED_FIELDS[klass] = klass.fields.keys | ['_id', '_type']
+      end
+
       klass.alize_from_callbacks = []
       klass.alize_to_callbacks = []
       klass.reset_callbacks(:save)
       klass.reset_callbacks(:create)
       klass.reset_callbacks(:destroy)
       klass.fields.reject! do |field, value|
-        !(persistent_fields[klass] +
-          persistent_fields[Object]).include?(field.to_sym)
+        !SAVED_FIELDS[klass].include?(field)
       end
       klass.instance_methods.each do |method|
         if method =~ /^_?denormalize_/ && method !~ /_all$/

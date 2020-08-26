@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe Mongoid::Alize::Macros do
   def person_default_fields
-    ["name", "created_at", "want_ids", "seen_by_id"]
+    ["name", "created_at", "my_date", "my_datetime", "want_ids", "seen_by_id", "above_type", "above_id"]
   end
 
   def head_default_fields
-    ["size", "weight", "person_id", "captor_id", "wanted_by_ids"]
+    ["size", "weight", "person_id", "captor_id", "wanted_by_ids", "nearest_type", "nearest_id"]
   end
 
   describe "#alize_to and #alize_from" do

@@ -227,8 +227,12 @@ describe Mongoid::Alize do
         @head.person_fields.should == {
           "name" => @name,
           "created_at" => @person.created_at,
+          "my_date" => nil,
+          "my_datetime" => nil,
           "seen_by_id" => nil,
-          "want_ids" => []
+          "want_ids" => [],
+          "above_id" => nil,
+          "above_type" => nil
         }
       end
 
@@ -238,8 +242,12 @@ describe Mongoid::Alize do
         @head.person_fields.should == {
           "name" => @name,
           "created_at" => @person.created_at,
+          "my_date" => nil,
+          "my_datetime" => nil,
           "seen_by_id" => nil,
-          "want_ids" => []
+          "want_ids" => [],
+          "above_id" => nil,
+          "above_type" => nil
         }
       end
     end
