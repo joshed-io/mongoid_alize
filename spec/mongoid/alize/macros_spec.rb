@@ -2,11 +2,19 @@ require 'spec_helper'
 
 describe Mongoid::Alize::Macros do
   def person_default_fields
-    ["name", "created_at", "my_date", "my_datetime", "want_ids", "seen_by_id", "above_type", "above_id"]
+    if Mongoid::Compatibility::Version.mongoid3?
+      ["name", "created_at", "want_ids", "seen_by_id", "above_type", "above_field", "above_id"]
+    else
+      ["name", "created_at", "my_date", "my_datetime", "want_ids", "seen_by_id", "above_type", "above_id"]
+    end
   end
 
   def head_default_fields
-    ["size", "weight", "person_id", "captor_id", "wanted_by_ids", "nearest_type", "nearest_id"]
+    if Mongoid::Compatibility::Version.mongoid3?
+      ["size", "weight", "person_id", "captor_id", "wanted_by_ids", "nearest_type", "nearest_field", "nearest_id"]
+    else
+      ["size", "weight", "person_id", "captor_id", "wanted_by_ids", "nearest_type", "nearest_id"]
+    end
   end
 
   describe "#alize_to and #alize_from" do
