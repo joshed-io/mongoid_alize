@@ -69,10 +69,20 @@ describe Mongoid::Alize::Macros do
       end
 
       describe "when no inverse is present" do
-        it "should add only a from callback" do
-          Head.relations["admirer"].inverse.should be_nil
-          dont_allow(Mongoid::Alize::ToCallback).new
-          Head.alize(:admirer)
+        if Mongoid::Compatibility::Version.mongoid7_or_newer?
+          # For Mongoid 7, the admirer field has a default inverse set to :seen_by despite :inverse_of => nil
+          # This is an uncommon/ambiguous situation since in Head we define :inverse_of => nil, but
+          # on the other side, Person does not have an "admiree" or corresponding field.
+          it "should not add only a from callback" do
+            Head.relations["admirer"].inverse.should eq(:seen_by)
+            Head.alize(:admirer)
+          end
+        else
+          it "should add only a from callback" do
+            Head.relations["admirer"].inverse.should be_nil
+            dont_allow(Mongoid::Alize::ToCallback).new
+            Head.alize(:admirer)
+          end
         end
       end
     end
