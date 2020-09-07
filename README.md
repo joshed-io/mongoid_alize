@@ -22,7 +22,7 @@ Features of Mongoid Alize
 
 Compatibility
 -------------
-As of June 2018, Mongoid Alize supports Mongoid up to version 6.4.
+As of September 2020, Mongoid Alize supports Mongoid up to version 7.0 and 7.1 thanks to [this PR](https://github.com/dzello/mongoid_alize/pull/56). You might need to bundle directly from git to get the latest support.
 
 Installation
 ------------
