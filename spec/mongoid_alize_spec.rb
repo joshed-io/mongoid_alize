@@ -224,23 +224,55 @@ describe Mongoid::Alize do
       it "should denormalize all non-internal fields" do
         Head.send(:alize, :person)
         @head.save!
-        @head.person_fields.should == {
-          "name" => @name,
-          "created_at" => @person.created_at,
-          "seen_by_id" => nil,
-          "want_ids" => []
-        }
+        if Mongoid::Compatibility::Version.mongoid3?
+          @head.person_fields.should == {
+            "name" => @name,
+            "created_at" => @person.created_at,
+            "seen_by_id" => nil,
+            "want_ids" => [],
+            "above_id" => nil,
+            "above_field" => nil,
+            "above_type" => nil
+          }
+        else
+          @head.person_fields.should == {
+            "name" => @name,
+            "created_at" => @person.created_at,
+            "my_date" => nil,
+            "my_datetime" => nil,
+            "seen_by_id" => nil,
+            "want_ids" => [],
+            "above_id" => nil,
+            "above_type" => nil
+          }
+        end
       end
 
       it "should denormalize all non-internal fields" do
         Head.send(:alize, :person)
         @person.save!
-        @head.person_fields.should == {
-          "name" => @name,
-          "created_at" => @person.created_at,
-          "seen_by_id" => nil,
-          "want_ids" => []
-        }
+        if Mongoid::Compatibility::Version.mongoid3?
+          @head.person_fields.should == {
+            "name" => @name,
+            "created_at" => @person.created_at,
+            "seen_by_id" => nil,
+            "want_ids" => [],
+            "above_id" => nil,
+            "above_field" => nil,
+            "above_type" => nil
+          }
+        else
+          @head.person_fields.should == {
+            "name" => @name,
+            "created_at" => @person.created_at,
+            "my_date" => nil,
+            "my_datetime" => nil,
+            "seen_by_id" => nil,
+            "want_ids" => [],
+            "above_id" => nil,
+            "above_type" => nil
+          }
+        end
       end
     end
 

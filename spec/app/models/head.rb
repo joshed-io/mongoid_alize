@@ -9,7 +9,13 @@ class Head
   field :size, type: Integer
   field :weight
 
-  if Mongoid::Compatibility::Version.mongoid6_or_newer?
+  if Mongoid::Compatibility::Version.mongoid7_or_newer?
+    # to whom it's attached
+    belongs_to :person, :inverse_of => :head, optional: true
+
+    # in whose possession it is
+    belongs_to :captor, :class_name => "Person", :inverse_of => :heads, optional: true
+  elsif Mongoid::Compatibility::Version.mongoid6_or_newer?
     # to whom it's attached
     belongs_to :person, optional: true
 
