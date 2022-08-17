@@ -1,0 +1,105 @@
+name: CI RSpec Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: >-
+      Mongoid ${{ matrix.mongoid }} - Ruby ${{ matrix.ruby }} - Rails ${{ matrix.rails }}
+    env:
+      CI: true
+      TESTOPTS: -v
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    strategy:
+      matrix:
+        ruby: [ 2.1, 2.2, 2.4, 2.5, 2.6, 2.7, 3.0, 3.1 ]
+        rails: [ 3.2, 4.0, 4.2, 5.0, 5.1, 5.2, 6.0, 6.1, 7.0 ]
+        mongoid: [ 3, 4, 5, 6.1, 6.2, 6.4, 7.5, 8.0 ]
+        exclude:
+          - mongoid: 3
+          - mongoid: 4
+          - mongoid: 5
+          - mongoid: 6.1
+          - mongoid: 6.2
+          - mongoid: 6.4
+          - mongoid: 7.5
+          - mongoid: 8.0
+        include:
+          - ruby: 2.1
+            rails: 3.2
+            mongoid: 3
+            bundler: 1
+          - ruby: 2.1
+            rails: 4.0
+            mongoid: 4
+            bundler: 1
+          - ruby: 2.2
+            rails: 4.2
+            mongoid: 4
+            bundler: 2
+          - ruby: 2.2
+            rails: 4.2
+            mongoid: 5
+            bundler: 2
+          - ruby: 2.4
+            rails: 5.0
+            mongoid: 6.1
+            bundler: 2
+          - ruby: 2.5
+            rails: 5.1
+            mongoid: 6.2
+            bundler: 2
+          - ruby: 2.5
+            rails: 5.2
+            mongoid: 6.4
+            bundler: 2
+          - ruby: 2.6
+            rails: 6.0
+            mongoid: 7.5
+            bundler: 2
+          - ruby: 2.6
+            rails: 6.1
+            mongoid: 7.5
+            bundler: 2
+          - ruby: 2.7
+            rails: 6.1
+            mongoid: 7.5
+            bundler: 2
+          - ruby: 3.0
+            rails: 6.1
+            mongoid: 8.0
+            bundler: 2
+          - ruby: 3.1
+            rails: 7.0
+            mongoid: 8.0
+            bundler: 2
+    steps:
+      - name: repo checkout
+        uses: actions/checkout@v2
+
+      - name: start mongodb
+        uses: supercharge/mongodb-github-action@1.6.0
+        with:
+          mongodb-version: 3.6
+          mongodb-replica-set: rs0
+
+      - name: load ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: ${{ matrix.bundler }}
+
+      - name: bundle install
+        run:  bundle install --jobs 4 --retry 3
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
+          RAILS_VERSION: ${{ matrix.rails }}
+
+      - name: test
+        timeout-minutes: 10
+        run: bundle exec rspec spec
+        continue-on-error: false
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
+          RAILS_VERSION: ${{ matrix.rails }}

@@ -1,7 +1,7 @@
 Mongoid::Alize
 ==============
 
-[![Build Status](https://secure.travis-ci.org/dzello/mongoid_alize.png?branch=master)](http://travis-ci.org/dzello/mongoid\_alize)
+[![Build Status](https://github.com/dzello/mongoid_alize/actions/workflows/test.yml/badge.svg)](https://github.com/dzello/mongoid_alize/actions)
 [![Code Climate](https://codeclimate.com/github/dzello/mongoid_alize.png)](https://codeclimate.com/github/dzello/mongoid\_alize)
 
 **Comprehensive, flexible denormalization for Mongoid that stays in sync**
