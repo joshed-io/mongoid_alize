@@ -35,8 +35,9 @@ module Mongoid
       end
 
       def callback_attached?(callback_type, callback_name)
-        !!klass.send(:"_#{callback_type}_callbacks").
-          map(&:raw_filter).include?(callback_name)
+        callbacks = klass.send(:"_#{callback_type}_callbacks")
+        filters = callbacks.map {|callback| callback.respond_to?(:raw_filter) ? callback.raw_filter : callback.filter}
+        !!filters.include?(callback_name)
       end
 
       def callback_defined?(callback_name)
