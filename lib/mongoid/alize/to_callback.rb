@@ -141,7 +141,8 @@ module Mongoid
       end
 
       def iterable_relation
-        "[self.#{relation}].flatten.compact"
+        scope = Mongoid::Alize.config.unscoped ? 'unscoped' : 'scoped'
+        "[self.#{relation}.#{scope}].flatten.compact"
       end
 
       def set_callback
